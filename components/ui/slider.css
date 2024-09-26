@@ -1,0 +1,24 @@
+/* Remove the default styling of the dots */
+.slick-dots li button:before {
+    display: none !important; /* Hide the default slick dot */
+  }
+  
+
+  /* Custom dot styles */
+  .slick-dots li button {
+    background-color: transparent; /* Remove default background */
+    border: none; /* Remove default border */
+    width: 25px; /* Custom width for dots */
+    height: 25px;
+    border-radius: 50%; /* Make the dots circular */
+    background-color: #B6B6B6; /* Default dot color */
+    opacity: 1;
+    margin-top: 20px;
+  }
+  
+  /* Active dot styling */
+  .slick-dots li.slick-active button {
+    background-color:  #FF9921;; /* Active dot color */
+    width: 25px; /* Larger size for active dot */
+    height: 25px;
+  }
