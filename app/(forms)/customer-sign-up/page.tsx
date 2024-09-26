@@ -1,5 +1,5 @@
 import React from "react";
-import CustomerSignForm from "@/app/ui/customer-signup-form";
+import CustomerSignForm from "@/components/forms/customer-signup-form";
 
 function page() {
   return (

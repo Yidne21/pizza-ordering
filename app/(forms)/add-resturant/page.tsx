@@ -1,5 +1,5 @@
 import React from "react";
-import AddResturantForm from "@/app/ui/add-resturant-form";
+import AddResturantForm from "@/components/forms/add-resturant-form";
 
 function page() {
   return (

@@ -1,5 +1,5 @@
 import React from "react";
-import ManagerSignForm from "@/app/ui/manager-signup-form";
+import ManagerSignForm from "@/components/forms/manager-signup-form";
 
 function page() {
   return (
