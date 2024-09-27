@@ -70,7 +70,7 @@ const FeaturedPizza = () => {
           sx={{
             color: "rgba(0, 0, 0, 0.50)",
             fontFamily: "Roboto",
-            fontSize: { xs: "24px", sm: "32px", md: "40px", lg: "40px" },
+            fontSize: { xs: "15px", sm: "32px", md: "40px", lg: "40px" },
             fontWeight: 500,
             lineHeight: "150%",
           }}

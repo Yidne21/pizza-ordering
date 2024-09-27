@@ -15,8 +15,10 @@ const RestaurantCard = ({ resturant }: RestaurantCardProps) => (
     sx={{
       backgroundColor: "#FFF",
       borderRadius: "10px",
-      maxWidth: { xs: "298px", sm: "320px", md: "400px", lg: "574px" },
-      maxHeight: { xs: "90px", sm: "100px", md: "120px", lg: "154px" },
+      maxWidth: { xs: "100%", sm: "320px", md: "400px", lg: "574px" },
+      maxHeight: { xs: "100%", sm: "100px", md: "120px", lg: "154px" },
+      border: "none",
+      boxShadow: "none",
     }}
   >
     <CardContent
@@ -47,7 +49,7 @@ const RestaurantCard = ({ resturant }: RestaurantCardProps) => (
         >
           <Avatar
             alt={resturant.name}
-            src={resturant.logo}
+            src="/images/ava.svg"
             sx={{
               width: { xs: "25px", sm: "30px", md: "40px", lg: "50px" },
               height: { xs: "25px", sm: "30px", md: "40px", lg: "50px" },

@@ -1,7 +1,6 @@
 import React from "react";
 import { Box, Typography, TextField, Button } from "@mui/material";
 import Image from "next/image";
-import SearchOutlinedIcon from "@mui/icons-material/SearchOutlined";
 
 const HeroSection = () => {
   return (
@@ -68,69 +67,83 @@ const HeroSection = () => {
           </Typography>
         </Box>
         {/* Search Box */}
-        <Box
+
+        <TextField
+          placeholder="Search"
+          fullWidth
           sx={{
-            display: "flex",
-            justifyContent: "flex-start",
-            alignItems: "center",
+            cursor: "pointer",
+            "& fieldset": { border: "none" },
+            backgroundColor: "#FFFFFF",
             borderRadius: "100px",
-            boxShadow: "0px 4px 10px rgba(0, 0, 0, 0.1)",
-            overflow: "hidden",
-            width: { xs: "230px", sm: "361px", md: "450px", lg: "748px" },
-            height: { xs: "57px", sm: "60px", md: "70px", lg: "118px" },
-          }}
-        >
-          <TextField
-            variant="outlined"
-            placeholder="Search"
-            sx={{
-              width: "100%",
-              "& fieldset": { border: "none" },
-              backgroundColor: "#FFFFFF",
-              borderRadius: "100px",
-              height: { xs: "80px", sm: "80px", md: "70px", lg: "118px" },
-              alignItems: "flex-start",
-              justifyContent: "center",
-              pl: { xs: "17px", sm: "20px", md: "30px", lg: "36px" },
-              "& .MuiInputBase-input::placeholder": {
-                color: "var(--Greyscale-Grey-500, #6C727F)",
-                fontFamily: "Plus Jakarta Sans",
-                fontWeight: 700,
-                fontSize: { xs: "15px", sm: "16px", md: "30px", lg: "30px" },
-                lineHeight: {
-                  xs: "22.5px",
-                  sm: "24px",
-                  md: "30px",
-                  lg: "45px",
-                },
+            height: { xs: "57px", sm: "70px", md: "80px", lg: "118px" },
+            width: { xs: "261px", lg: "718px" },
+            alignItems: "center",
+            justifyContent: "center",
+            "& .MuiInputBase-root": {
+              padding: "5px",
+            },
+            pl: { xs: "17px", sm: "20px", md: "30px", lg: "36px" },
+            "& .MuiInputBase-input::placeholder": {
+              color: "var(--Greyscale-Grey-500, #6C727F)",
+              fontFamily: "Plus Jakarta Sans",
+              fontWeight: { xs: 500, lg: 700 },
+              fontSize: { xs: "15px", sm: "16px", md: "30px", lg: "30px" },
+              lineHeight: {
+                xs: "22.5px",
+                sm: "24px",
+                md: "30px",
+                lg: "45px",
               },
-            }}
-          />
-          <Button
-            variant="contained"
-            color="primary"
-            sx={{
-              borderRadius: "360px",
-              backgroundColor: "#FF890F",
-              p: "14px",
-              position: "absolute",
-              left: { xs: "171px", sm: "310px", md: "450px", lg: "720px" },
-              width: { xs: "50px", sm: "55px", md: "65px", lg: "106px" },
-              height: { xs: "50px", sm: "55px", md: "65px", lg: "106px" },
-              cursor: "pointer",
-              alignItems: "center",
-              justifyContent: "center",
-            }}
-          >
-            <SearchOutlinedIcon
-              sx={{
-                color: "#FFFFFF",
-                width: { xs: "24px", sm: "30px", md: "40px", lg: "50px" },
-                height: { xs: "24px", sm: "30px", md: "40px", lg: "50px" },
-              }}
-            />
-          </Button>
-        </Box>
+            },
+          }}
+          slotProps={{
+            input: {
+              endAdornment: (
+                <Button
+                  variant="contained"
+                  color="primary"
+                  sx={{
+                    borderRadius: "360%",
+                    backgroundColor: "#FF890F",
+                    p: "14px",
+                    width: {
+                      xs: "52px",
+                      sm: "65px",
+                      md: "75px",
+                      lg: "106px",
+                    },
+                    height: {
+                      xs: "52px",
+                      sm: "55px",
+                      md: "65px",
+                      lg: "106px",
+                    },
+                    cursor: "pointer",
+                    alignItems: "center",
+                    justifyContent: "center",
+                  }}
+                >
+                  <Box
+                    sx={{
+                      position: "relative",
+                      width: { xs: "24px", lg: "50px" },
+                      height: { xs: "24px", lg: "50px" },
+                      cursor: "pointer",
+                    }}
+                  >
+                    <Image
+                      src="/icons/search-.svg"
+                      fill
+                      alt="search"
+                      objectFit="contain"
+                    />
+                  </Box>
+                </Button>
+              ),
+            },
+          }}
+        />
       </Box>
 
       {/* Right Section (Pizza Image) */}
