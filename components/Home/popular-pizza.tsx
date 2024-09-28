@@ -12,32 +12,64 @@ const pizzaData = [
     restaurant: "Azmera Pizza",
     restaurantAvatar: "/images/ava.svg",
   },
+  {
+    name: "Pepperoni",
+    description: "Tomato, Mozzarella, Pepperoni",
+    price: 180,
+    image: "/pizza.jpg",
+    restaurant: "Pepperoni Palace",
+    restaurantAvatar: "/images/pepperoni.svg",
+  },
+  {
+    name: "BBQ Chicken",
+    description: "BBQ sauce, Chicken, Mozzarella",
+    price: 200,
+    image: "/pizza.jpg",
+    restaurant: "BBQ Grill",
+    restaurantAvatar: "/images/bbq.svg",
+  },
+
+  {
+    name: "Pepperoni",
+    description: "Tomato, Mozzarella, Pepperoni",
+    price: 180,
+    image: "/pizza.jpg",
+    restaurant: "Pepperoni Palace",
+    restaurantAvatar: "/images/pepperoni.svg",
+  },
+  {
+    name: "BBQ Chicken",
+    description: "BBQ sauce, Chicken, Mozzarella",
+    price: 200,
+    image: "/pizza.jpg",
+    restaurant: "BBQ Grill",
+    restaurantAvatar: "/images/bbq.svg",
+  },
 ];
 
 function PopularPizza() {
   return (
     <PizzaSection title="Popular Pizza">
-      {pizzaData.map((pizza, index) => (
-        <Box
-          key={index}
-          sx={{
-            display: "flex",
-            flexWrap: "wrap",
-            columnGap: "50px",
-            rowGap: { xs: "10px", lg: "25px" },
-            columnCount: { xs: 1, sm: 2, md: 3, lg: 3 },
-            width: { xs: "100%", sm: "100%", md: "100%", lg: "100vw" },
-          }}
-        >
-          <PizzaCard pizza={pizza} />
-          <PizzaCard pizza={pizza} />
-          <PizzaCard pizza={pizza} />
-          <PizzaCard pizza={pizza} />
-          <PizzaCard pizza={pizza} />
-          <PizzaCard pizza={pizza} />
-          <PizzaCard pizza={pizza} />
-        </Box>
-      ))}
+      <Box
+        sx={{
+          display: "flex",
+          flexWrap: "wrap",
+          gap: "25px",
+          width: "100%",
+        }}
+      >
+        {pizzaData.map((pizza, index) => (
+          <Box
+            key={index}
+            sx={{
+              flexBasis: { xs: "100%", sm: "48%", md: "30%" }, // Flex basis for 1, 2, or 3 columns
+              maxWidth: { xs: "100%", sm: "48%", md: "30%" }, // Ensures each column takes up correct width
+            }}
+          >
+            <PizzaCard pizza={pizza} />
+          </Box>
+        ))}
+      </Box>
     </PizzaSection>
   );
 }

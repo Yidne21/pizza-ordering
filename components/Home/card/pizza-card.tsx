@@ -10,18 +10,21 @@ import {
 } from "@mui/material";
 import Divider from "@mui/material/Divider";
 
-const PizzaCard = ({
-  pizza,
-}: {
+type PizzaCardProps = {
   pizza: {
+    id?: string;
     image: string;
     name: string;
     description: string;
-    restaurantAvatar: string;
-    restaurant: string;
+    restaurantAvatar?: string;
+    restaurant?: string;
     price: number;
+    status?: string;
   };
-}) => {
+  isOrdered?: boolean;
+};
+
+const PizzaCard = (props: PizzaCardProps) => {
   return (
     <Card
       sx={{
@@ -52,7 +55,7 @@ const PizzaCard = ({
           pl: "15px",
         }}
         image="/images/wfullpizza.png"
-        alt={pizza.name}
+        alt={props.pizza.name}
       />
 
       <CardContent
@@ -76,7 +79,7 @@ const PizzaCard = ({
               letterSpacing: { xs: "0.6px", lg: "0.72px" },
             }}
           >
-            {pizza.name}
+            {props.pizza.name}
           </Typography>
           <Typography
             sx={{
@@ -90,7 +93,7 @@ const PizzaCard = ({
               mt: "10px",
             }}
           >
-            {pizza.description}
+            {props.pizza.description}
           </Typography>
 
           <Box
@@ -119,7 +122,7 @@ const PizzaCard = ({
                   letterSpacing: { xs: "0.9px", lg: "1.35px" },
                 }}
               >
-                {pizza.price}
+                {props.pizza.price}
               </Typography>
               <Typography
                 sx={{
@@ -136,76 +139,99 @@ const PizzaCard = ({
               </Typography>
             </Box>
 
-            <Button
-              sx={{
-                display: "flex",
-                padding: { lg: "10px 20px" },
-                justifyContent: "center",
-                alignItems: "center",
-                borderRadius: "10px",
-                background: "#FF8100",
-                color: "#FDFFFE",
-              }}
-            >
+            {!props.isOrdered && (
+              <Button
+                sx={{
+                  display: "flex",
+                  padding: { lg: "10px 20px" },
+                  justifyContent: "center",
+                  alignItems: "center",
+                  borderRadius: "10px",
+                  background: "#FF8100",
+                  color: "#FDFFFE",
+                }}
+              >
+                <Typography
+                  sx={{
+                    color: "##FDFFFE",
+                    fontFamily: "Inter",
+                    fontSize: { xs: "25px", lg: "32px" },
+                    fontStyle: "normal",
+                    fontWeight: 700,
+                    lineHeight: { xs: "36px", lg: "46px" },
+                    letterSpacing: { xs: "0.75", lg: "0.96px" },
+                    textTransform: "none",
+                  }}
+                  variant="button"
+                >
+                  Order
+                </Typography>
+              </Button>
+            )}
+
+            {props.isOrdered && (
               <Typography
                 sx={{
-                  color: "##FDFFFE",
+                  color:
+                    props.pizza.status === "Ordered" ? "#FFA500" : "#008000",
                   fontFamily: "Inter",
-                  fontSize: { xs: "25px", lg: "32px" },
+                  fontSize: "32px",
                   fontStyle: "normal",
                   fontWeight: 700,
-                  lineHeight: { xs: "36px", lg: "46px" },
-                  letterSpacing: { xs: "0.75", lg: "0.96px" },
-                  textTransform: "none",
+                  lineHeight: "46px",
+                  letterSpacing: "0.96px",
                 }}
-                variant="button"
               >
-                Order
+                {props.pizza.status}
               </Typography>
-            </Button>
+            )}
           </Box>
         </Box>
 
-        <Divider
-          sx={{
-            my: "5px",
-            width: "100%",
-            background: "rgba(0, 0, 0, 0.10)",
-            height: "var(--none, 1px)",
-          }}
-          component="hr"
-        />
+        {!props.isOrdered && (
+          <>
+            <Divider
+              sx={{
+                my: "5px",
+                width: "100%",
+                background: "rgba(0, 0, 0, 0.10)",
+                height: "var(--none, 1px)",
+              }}
+              component="hr"
+            />
 
-        {/* footer */}
-        <Box
-          sx={{
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "space-between",
-          }}
-        >
-          <Avatar
-            src={pizza.restaurantAvatar}
-            sx={{
-              width: "65px",
-              height: "65px",
-              borderRadius: "var(--none, 65px)",
-            }}
-          />
-          <Typography
-            sx={{
-              color: "rgba(0, 0, 0, 0.75)",
-              fontFamily: "Roboto",
-              fontSize: "20px",
-              fontStyle: "normal",
-              fontWeight: 700,
-              lineHeight: "18px",
-              letterSpacing: "0.6px",
-            }}
-          >
-            {pizza.restaurant}
-          </Typography>
-        </Box>
+            {/* footer */}
+            <Box
+              sx={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "space-between",
+              }}
+            >
+              <Avatar
+                src={props.pizza.restaurantAvatar}
+                sx={{
+                  width: "65px",
+                  height: "65px",
+                  borderRadius: "var(--none, 65px)",
+                }}
+              />
+              <Typography
+                sx={{
+                  color: "rgba(0, 0, 0, 0.75)",
+                  fontFamily: "Roboto",
+                  fontSize: "20px",
+                  fontStyle: "normal",
+                  fontWeight: 700,
+                  lineHeight: "18px",
+                  letterSpacing: "0.6px",
+                }}
+              >
+                {props.pizza.restaurant}
+              </Typography>
+            </Box>
+          </>
+        )}
       </CardContent>
     </Card>
   );

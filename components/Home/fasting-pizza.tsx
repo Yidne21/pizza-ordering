@@ -4,6 +4,7 @@ import React from "react";
 import CustomeSlider from "../ui/slider";
 import PizzaSection from "./pizza-section";
 import PizzaCard from "./card/pizza-card";
+import { Box, styled } from "@mui/material";
 
 const fastingPizzas = [
   {
@@ -57,6 +58,14 @@ const fastingPizzas = [
 ];
 
 function FastingPizza() {
+  const CustomSliderWrapper = styled(Box)({
+    "& .slick-slide": {
+      padding: "10px 10px",
+    },
+    backgroundColor:
+      " linear-gradient(180deg, rgba(250, 126, 0, 0.00) 0%, rgba(250, 126, 0, 0.20) 60.5%, rgba(148, 74, 0, 0.00) 100%)",
+  });
+
   const settings = {
     infinite: false,
     speed: 1000,
@@ -86,11 +95,13 @@ function FastingPizza() {
 
   return (
     <PizzaSection title="Fasting Pizza">
-      <CustomeSlider settings={settings}>
-        {fastingPizzas.map((pizza, index) => (
-          <PizzaCard key={index} pizza={pizza} />
-        ))}
-      </CustomeSlider>
+      <CustomSliderWrapper>
+        <CustomeSlider settings={settings}>
+          {fastingPizzas.map((pizza, index) => (
+            <PizzaCard key={index} pizza={pizza} />
+          ))}
+        </CustomeSlider>
+      </CustomSliderWrapper>
     </PizzaSection>
   );
 }

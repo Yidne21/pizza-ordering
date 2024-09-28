@@ -57,6 +57,10 @@ const Footer = () => {
                 fontWeight: "700px",
                 lineHeight: "36px",
                 letterSpacing: "0.75px",
+                "&:hover": {
+                  color: "#FFF",
+                  textDecoration: "underline",
+                },
               }}
             >
               Home
@@ -71,6 +75,10 @@ const Footer = () => {
                 fontWeight: "700px",
                 lineHeight: "36px",
                 letterSpacing: "0.75px",
+                "&:hover": {
+                  color: "#FFF",
+                  textDecoration: "underline",
+                },
               }}
             >
               Orders
@@ -85,6 +93,10 @@ const Footer = () => {
                 fontWeight: "700px",
                 lineHeight: "36px",
                 letterSpacing: "0.75px",
+                "&:hover": {
+                  color: "#FFF",
+                  textDecoration: "underline",
+                },
               }}
             >
               About us
