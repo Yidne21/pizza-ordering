@@ -1,38 +1,44 @@
 "use client";
 
 import React from "react";
-import DashboardOutlinedIcon from "@mui/icons-material/DashboardOutlined";
-import PersonOutlineOutlinedIcon from "@mui/icons-material/PersonOutlineOutlined";
-import BookmarksOutlinedIcon from "@mui/icons-material/BookmarksOutlined";
+import {
+  UsersIcon,
+  RolesIcon,
+  OrderIcon,
+  AddMenuIcon,
+} from "@/components/ui/icons";
 
 type AdminLink = {
   title: string;
   path: string;
-  icon: React.ElementType;
+  icon: React.FC<React.SVGProps<SVGSVGElement>>;
   id: string;
-  disable: boolean;
 };
 
 export const sideBarMenu: AdminLink[] = [
   {
-    title: "Dashboard",
-    path: "/dashboard",
-    icon: DashboardOutlinedIcon,
-    id: "dashboard",
-    disable: false,
+    title: "Orders",
+    path: "/dashboard/orders",
+    icon: OrderIcon,
+    id: "orders ",
   },
   {
-    title: "Books",
-    path: "/dashboard/books",
-    icon: BookmarksOutlinedIcon,
-    id: "books",
-    disable: false,
+    title: "Add menu",
+    path: "/dashboard/add-menu",
+    icon: AddMenuIcon,
+    id: "add-menu",
   },
   {
-    title: "Owners",
-    path: "/dashboard/owners",
-    icon: PersonOutlineOutlinedIcon,
-    id: "owners",
-    disable: false,
+    title: "Roles",
+    path: "/dashboard/roles",
+    icon: RolesIcon,
+    id: "roles",
+  },
+
+  {
+    title: "Users",
+    path: "/dashboard/users",
+    icon: UsersIcon,
+    id: "users",
   },
 ];

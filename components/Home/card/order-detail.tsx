@@ -32,7 +32,7 @@ const toppings = ["Cheese", "Tomato", "Mushroom", "Onion", "Capsicum"];
 
 const OrderDetailCard: React.FC = () => {
   const [activeImage, setActiveImage] = useState<string>(
-    "/images/wfullpizza.png"
+    "/images/featPizza2.png"
   );
   const [isRolling, setIsRolling] = useState<boolean>(false);
   const [rollingImage, setRollingImage] = useState<string>("");
@@ -56,6 +56,7 @@ const OrderDetailCard: React.FC = () => {
     <Card
       sx={{
         p: { xs: "20px", lg: "51px" },
+        background: "#FFF8F1",
       }}
     >
       <CardContent

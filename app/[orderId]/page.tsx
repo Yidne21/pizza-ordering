@@ -1,6 +1,7 @@
 import React from "react";
 import OrderDetailCard from "@/components/Home/card/order-detail";
 import { Box } from "@mui/material";
+import RelatedPizza from "@/components/Home/related-pzza";
 
 function OrderDetail() {
   return (
@@ -10,6 +11,7 @@ function OrderDetail() {
       }}
     >
       <OrderDetailCard />
+      <RelatedPizza />
     </Box>
   );
 }

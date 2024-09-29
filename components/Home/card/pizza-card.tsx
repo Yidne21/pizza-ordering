@@ -22,6 +22,7 @@ type PizzaCardProps = {
     status?: string;
   };
   isOrdered?: boolean;
+  isRelated?: boolean;
 };
 
 const PizzaCard = (props: PizzaCardProps) => {
@@ -104,42 +105,44 @@ const PizzaCard = (props: PizzaCardProps) => {
               mt: 2,
             }}
           >
-            <Box
-              sx={{
-                display: "flex",
-                alignItems: "top",
-                gap: "5px",
-              }}
-            >
-              <Typography
+            {!props.isRelated && (
+              <Box
                 sx={{
-                  color: "#01C550",
-                  fontFamily: "Roboto",
-                  fontSize: { xs: "30px", lg: "45px" },
-                  fontStyle: "normal",
-                  fontWeight: 700,
-                  lineHeight: { xs: "29px", lg: "45px" },
-                  letterSpacing: { xs: "0.9px", lg: "1.35px" },
+                  display: "flex",
+                  alignItems: "top",
+                  gap: "5px",
                 }}
               >
-                {props.pizza.price}
-              </Typography>
-              <Typography
-                sx={{
-                  color: "rgba(0, 0, 0, 0.75)",
-                  fontFamily: "Roboto",
-                  fontSize: { lg: "15px" },
-                  fontStyle: "normal",
-                  fontWeight: 400,
-                  lineHeight: "14px",
-                  letterSpacing: "0.45px",
-                }}
-              >
-                Birr
-              </Typography>
-            </Box>
+                <Typography
+                  sx={{
+                    color: "#01C550",
+                    fontFamily: "Roboto",
+                    fontSize: { xs: "30px", lg: "45px" },
+                    fontStyle: "normal",
+                    fontWeight: 700,
+                    lineHeight: { xs: "29px", lg: "45px" },
+                    letterSpacing: { xs: "0.9px", lg: "1.35px" },
+                  }}
+                >
+                  {props.pizza.price}
+                </Typography>
+                <Typography
+                  sx={{
+                    color: "rgba(0, 0, 0, 0.75)",
+                    fontFamily: "Roboto",
+                    fontSize: { lg: "15px" },
+                    fontStyle: "normal",
+                    fontWeight: 400,
+                    lineHeight: "14px",
+                    letterSpacing: "0.45px",
+                  }}
+                >
+                  Birr
+                </Typography>
+              </Box>
+            )}
 
-            {!props.isOrdered && (
+            {!props.isOrdered && !props.isRelated && (
               <Button
                 sx={{
                   display: "flex",
@@ -188,7 +191,7 @@ const PizzaCard = (props: PizzaCardProps) => {
           </Box>
         </Box>
 
-        {!props.isOrdered && (
+        {!props.isOrdered && !props.isRelated && (
           <>
             <Divider
               sx={{
