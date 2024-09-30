@@ -1,6 +1,5 @@
 "use client";
-
-import { useState } from "react";
+import React, { useState } from "react";
 import {
   MaterialReactTable,
   MRT_ColumnFilterFnsState,
@@ -10,6 +9,7 @@ import {
   type MRT_ColumnFiltersState,
 } from "material-react-table";
 import { Box, Button, Typography } from "@mui/material";
+import AddRolePopUp from "@/app/dashboard/roles/add-role-popup";
 
 type CustomeTableProps<T extends MRT_RowData> = {
   data: T[]; // Data is passed as a prop, assuming it's fetched via SSR
@@ -37,6 +37,15 @@ const CustomeTable = <T extends MRT_RowData>({
         ) as MRT_ColumnFilterFnsState
     );
 
+  const [open, setOpen] = useState(false);
+  const handleModalClose = () => {
+    setOpen(!open);
+  };
+
+  const handleModalOpen = () => {
+    setOpen(!open);
+  };
+
   // Setting up Material React Table using custom hooks
   const table = useMaterialReactTable({
     enableColumnActions: false,
@@ -49,69 +58,78 @@ const CustomeTable = <T extends MRT_RowData>({
     manualFiltering: true,
     enableGlobalFilter: true,
     enableColumnFilters: true,
-    renderTopToolbarCustomActions: () => (
-      <Box>
-        {title === "orders" && (
-          <Typography
-            sx={{
-              fontSize: "16px",
-              fontWeight: 400,
-              color:
-                "var(--on-surface-medium-emphasis-60, rgba(0, 0, 0, 0.60))",
-              fontFamily: "Roboto",
-              fontStyle: "normal",
-              letterSpacing: "0.15px",
-            }}
-          >
-            Packages
-          </Typography>
-        )}
+    renderTopToolbarCustomActions: () => {
+      return (
+        <Box>
+          {title === "orders" && (
+            <Typography
+              sx={{
+                fontSize: "16px",
+                fontWeight: 400,
+                color:
+                  "var(--on-surface-medium-emphasis-60, rgba(0, 0, 0, 0.60))",
+                fontFamily: "Roboto",
+                fontStyle: "normal",
+                letterSpacing: "0.15px",
+              }}
+            >
+              Packages
+            </Typography>
+          )}
 
-        {title === "users" && (
-          <Button
-            variant="contained"
-            sx={{
-              background: "#FF8100",
-              borderRadius: "5px",
-              color: "#FFFFFF",
-              textTransform: "capitalize",
-              fontSize: "16px",
-              fontFamily: "Roboto",
-              fontStyle: "normal",
-              fontWeight: 500,
-              letterSpacing: "0.15px",
-              fontFeatureSettings: { liga: "off", clig: "off" },
-              boxShadow: "none",
-              border: "none",
-            }}
-          >
-            Add users
-          </Button>
-        )}
+          {title === "users" && (
+            <>
+              <Button
+                variant="contained"
+                sx={{
+                  background: "#FF8100",
+                  borderRadius: "5px",
+                  color: "#FFFFFF",
+                  textTransform: "capitalize",
+                  fontSize: "16px",
+                  fontFamily: "Roboto",
+                  fontStyle: "normal",
+                  fontWeight: 500,
+                  letterSpacing: "0.15px",
+                  fontFeatureSettings: { liga: "off", clig: "off" },
+                  boxShadow: "none",
+                  border: "none",
+                }}
+                onClick={handleModalOpen}
+              >
+                Add users
+              </Button>
+            </>
+          )}
 
-        {title === "roles" && (
-          <Button
-            variant="contained"
-            sx={{
-              background: "#FF8100",
-              borderRadius: "5px",
-              color: "#FFFFFF",
-              textTransform: "capitalize",
-              fontSize: "16px",
-              fontFamily: "Roboto",
-              fontStyle: "normal",
-              fontWeight: 500,
-              letterSpacing: "0.15px",
-              fontFeatureSettings: { liga: "off", clig: "off" },
-              boxShadow: "none",
-              border: "none",
-            }}
-          >
-            Add roles
-          </Button>
-        )}
-      </Box>
-    ),
+          {title === "roles" && (
+            <Box>
+              <Button
+                variant="contained"
+                sx={{
+                  background: "#FF8100",
+                  borderRadius: "5px",
+                  color: "#FFFFFF",
+                  textTransform: "capitalize",
+                  fontSize: "16px",
+                  fontFamily: "Roboto",
+                  fontStyle: "normal",
+                  fontWeight: 500,
+                  letterSpacing: "0.15px",
+                  fontFeatureSettings: { liga: "off", clig: "off" },
+                  boxShadow: "none",
+                  border: "none",
+                }}
+                onClick={handleModalOpen}
+              >
+                Add roles
+              </Button>
+              <AddRolePopUp open={open} onClose={handleModalClose} />
+            </Box>
+          )}
+        </Box>
+      );
+    },
 
     columns,
     data,

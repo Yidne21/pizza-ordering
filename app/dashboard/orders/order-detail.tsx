@@ -35,8 +35,27 @@ function OrderDetail(props: OrderDetailProps) {
     lineHeight: "150%", // 24px
     letterSpacing: "0.15px",
   };
+
+  const boxStyle = {
+    display: "flex",
+    gap: "10px",
+  };
+
+  function getRandomColorExceptWhite(): string {
+    let color: string;
+
+    do {
+      // Generate a random color
+      color = `#${Math.floor(Math.random() * 16777215)
+        .toString(16)
+        .padStart(6, "0")}`;
+    } while (color.toUpperCase() === "#FFFFFF");
+
+    return color;
+  }
+
   return (
-    <CustomModal open={props.open} onClose={props.onClose}>
+    <CustomModal open={props.open} onClose={props.onClose} showCloseIcon={true}>
       <Box
         sx={{
           display: "flex",
@@ -70,17 +89,46 @@ function OrderDetail(props: OrderDetailProps) {
             width: "100%",
           }}
         >
-          <Box>
+          <Box sx={{ ...boxStyle }}>
             <Typography sx={{ ...labelStyle }}>Name:</Typography>
 
             <Typography sx={{ ...valueStyle }}>{props.order.name}</Typography>
           </Box>
 
-          <Box>
+          <Box sx={{ ...boxStyle }}>
             <Typography sx={{ ...labelStyle }}>Toppings:</Typography>
+            <Box
+              sx={{
+                display: "flex",
+                gap: "10px",
+                flexWrap: "wrap",
+                width: "100%",
+              }}
+            >
+              {props.order.toppings.map((topping, index) => (
+                <Typography
+                  key={index}
+                  sx={{
+                    backgroundColor: getRandomColorExceptWhite(),
+                    borderRadius: "100px",
+                    color: "#FFF",
+                    fontFeatureSettings: "'liga' off, 'clig' off",
+                    fontFamily: "Roboto",
+                    fontSize: "14px",
+                    fontStyle: "normal",
+                    fontWeight: 400,
+                    lineHeight: "21px",
+                    letterSpacing: "0.15px",
+                    padding: "4px 10px",
+                  }}
+                >
+                  {topping}
+                </Typography>
+              ))}
+            </Box>
           </Box>
 
-          <Box>
+          <Box sx={{ ...boxStyle }}>
             <Typography sx={{ ...labelStyle }}>Quantity:</Typography>
             <Typography sx={{ ...valueStyle }}>
               {props.order.quantity}

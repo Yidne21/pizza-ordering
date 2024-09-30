@@ -34,7 +34,6 @@ const Sidebar = ({ isOpen, setIsOpen }: SidebarProps) => {
         height: "100%",
         display: "flex",
         flexDirection: "column",
-        gap: "20px",
         boxShadow: "0px 0px 20px 0px rgba(0, 0, 0, 0.05)",
       }}
     >
@@ -43,11 +42,12 @@ const Sidebar = ({ isOpen, setIsOpen }: SidebarProps) => {
       {isOpen && (
         <Box
           sx={{
-            p: "21px 10px 22px 10px",
+            p: "21px 10px 0px 10px",
             background: "rgba(243, 243, 243, 0.25)",
             alignItems: "center",
             display: "flex",
             justifyContent: "center",
+            height: "65px",
           }}
         >
           <MenuIcon
@@ -67,11 +67,12 @@ const Sidebar = ({ isOpen, setIsOpen }: SidebarProps) => {
       {!isOpen && (
         <Box
           sx={{
-            p: "21px 10px 22px 10px",
+            p: "21px 10px 0px 10px",
             display: "flex",
             justifyContent: "space-between",
             alignItems: "center",
             background: "rgba(243, 243, 243, 0.25)",
+            height: "65px",
           }}
         >
           <Typography

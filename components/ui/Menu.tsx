@@ -20,6 +20,17 @@ export default function Dropdown(props: DropdownProps) {
     setStatus(event.target.value);
   };
 
+  const sharedStyle = {
+    textAlign: "center",
+    fontFeatureSettings: "'liga' off, 'clig' off",
+    fontFamily: "Roboto, sans-serif",
+    fontSize: "12px",
+    fontStyle: "normal",
+    fontWeight: 400,
+    lineHeight: "20px",
+    letterSpacing: "0.25px",
+  };
+
   return (
     <FormControl>
       <Select
@@ -48,14 +59,7 @@ export default function Dropdown(props: DropdownProps) {
               primary="PREPARING"
               primaryTypographyProps={{
                 sx: {
-                  textAlign: "center",
-                  fontFeatureSettings: "'liga' off, 'clig' off",
-                  fontFamily: "Roboto, sans-serif",
-                  fontSize: "12px",
-                  fontStyle: "normal",
-                  fontWeight: 400,
-                  lineHeight: "20px",
-                  letterSpacing: "0.25px",
+                  ...sharedStyle,
                 },
               }}
             />
@@ -70,14 +74,7 @@ export default function Dropdown(props: DropdownProps) {
               primary="READY"
               primaryTypographyProps={{
                 sx: {
-                  textAlign: "center",
-                  fontFeatureSettings: "'liga' off, 'clig' off",
-                  fontFamily: "Roboto, sans-serif",
-                  fontSize: "12px",
-                  fontStyle: "normal",
-                  fontWeight: 400,
-                  lineHeight: "20px",
-                  letterSpacing: "0.25px",
+                  ...sharedStyle,
                 },
               }}
             />
@@ -90,14 +87,7 @@ export default function Dropdown(props: DropdownProps) {
               primary="DELIVERED"
               primaryTypographyProps={{
                 sx: {
-                  textAlign: "center",
-                  fontFeatureSettings: "'liga' off, 'clig' off",
-                  fontFamily: "Roboto, sans-serif",
-                  fontSize: "12px",
-                  fontStyle: "normal",
-                  fontWeight: 400,
-                  lineHeight: "20px",
-                  letterSpacing: "0.25px",
+                  ...sharedStyle,
                 },
               }}
             />

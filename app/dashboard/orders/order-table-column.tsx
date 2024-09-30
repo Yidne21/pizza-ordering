@@ -113,7 +113,20 @@ const columns: MRT_ColumnDef<Order>[] = [
                   height: "24px",
                 }}
               />
-              <Typography>{status}</Typography>
+              <Typography
+                sx={{
+                  textAlign: "center",
+                  fontFeatureSettings: "'liga' off, 'clig' off",
+                  fontFamily: "Roboto, sans-serif",
+                  fontSize: "12px",
+                  fontStyle: "normal",
+                  fontWeight: 400,
+                  lineHeight: "20px",
+                  letterSpacing: "0.25px",
+                }}
+              >
+                {status}
+              </Typography>
             </Box>
           )}
         </Box>
