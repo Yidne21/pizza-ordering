@@ -35,6 +35,7 @@ const Sidebar = ({ isOpen, setIsOpen }: SidebarProps) => {
         display: "flex",
         flexDirection: "column",
         gap: "20px",
+        boxShadow: "0px 0px 20px 0px rgba(0, 0, 0, 0.05)",
       }}
     >
       {/* Header Section */}
@@ -237,50 +238,49 @@ const Sidebar = ({ isOpen, setIsOpen }: SidebarProps) => {
             </ListItem>
           );
         })}
-      </List>
-
-      {/* Logout Button Section */}
-      <Box
-        sx={{
-          display: "flex",
-          alignItems: "flex-start",
-          flexDirection: "column",
-          gap: "5px",
-          borderTop: "1px solid rgba(0, 0, 0, 0.10)",
-          padding: "10px 17px",
-        }}
-      >
-        <Button
-          variant="text"
-          startIcon={
-            <ExitToAppIcon
-              sx={{
-                width: isOpen ? 24 : 20,
-                height: isOpen ? 24 : 20,
-              }}
-            />
-          }
-          onClick={handleLogout}
-          fullWidth
+        {/* Logout Button Section */}
+        <Box
           sx={{
-            color: "#F00",
-            fontSize: "18px",
-            fontFamily: "Inter",
-            fontStyle: "normal",
-            fontWeight: 500,
-            lineHeight: "24px",
-            textTransform: "capitalize",
-            padding: "12px 46px",
-
-            ":hover": {
-              color: "none",
-              background: "none",
-            },
+            display: "flex",
+            alignItems: "flex-start",
+            borderTop: "1px solid rgba(0, 0, 0, 0.10)",
+            padding: "10px 5px",
+            width: "100%",
+            mt: 2,
           }}
         >
-          {!isOpen && "Logout"}
-        </Button>
-      </Box>
+          <Button
+            variant="text"
+            startIcon={
+              <ExitToAppIcon
+                sx={{
+                  width: isOpen ? 24 : 20,
+                  height: isOpen ? 24 : 20,
+                }}
+              />
+            }
+            onClick={handleLogout}
+            fullWidth
+            sx={{
+              color: "#F00",
+              fontSize: "18px",
+              fontFamily: "Inter",
+              fontStyle: "normal",
+              fontWeight: 500,
+              lineHeight: "24px",
+              textTransform: "capitalize",
+              padding: "12px 20px",
+
+              ":hover": {
+                color: "none",
+                background: "none",
+              },
+            }}
+          >
+            {!isOpen && "Logout"}
+          </Button>
+        </Box>
+      </List>
     </Box>
   );
 };
