@@ -10,8 +10,14 @@ import {
 } from "@mui/material";
 import Link from "next/link";
 
+import { useSearchParams } from "next/navigation";
+
 const label = { inputProps: { "aria-label": "Checkbox demo" } };
 const LoginForm = () => {
+  const router = useSearchParams();
+
+  const page = router.get("page");
+
   return (
     <>
       <Typography
@@ -70,7 +76,7 @@ const LoginForm = () => {
 
         <Box sx={{ display: "flex", justifyContent: "center" }}>
           <Typography>Have not have an account?</Typography>
-          <Link href="/" style={{ color: "#FF8100" }}>
+          <Link href={"/" + page} style={{ color: "#FF8100" }}>
             Sign up
           </Link>
         </Box>

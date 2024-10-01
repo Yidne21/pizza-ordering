@@ -68,3 +68,33 @@ export async function addUser(formData: FormData) {
     return { success: false, message: "Something went wrong" };
   }
 }
+
+export async function managerSignUpAction(formData: FormData) {
+  try {
+    // Example Cloudinary file upload logic or any other form data processing
+    // const response = await cloudinary.uploader.upload(...);
+
+    console.log("Manager data:", formData);
+
+    // Simulate success response (you would replace this with actual API logic)
+    return { success: true, message: "Manager added successfully" };
+  } catch (error) {
+    console.error("Error adding Manager:", error);
+    return { success: false, message: "Something went wrong" };
+  }
+}
+
+export async function customerSignUpAction(formData: FormData) {
+  try {
+    // Example Cloudinary file upload logic or any other form data processing
+    // const response = await cloudinary.uploader.upload(...);
+
+    console.log("Customer data:", formData);
+
+    // Simulate success response (you would replace this with actual API logic)
+    return { success: true, message: "Customer added successfully" };
+  } catch (error) {
+    console.error("Error adding Customer:", error);
+    return { success: false, message: "Something went wrong" };
+  }
+}

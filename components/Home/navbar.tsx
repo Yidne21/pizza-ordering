@@ -4,8 +4,14 @@ import { Box, Typography, Button } from "@mui/material";
 import Image from "next/image";
 import { CustomLink } from "@/app/custom-link";
 import MenuOutlinedIcon from "@mui/icons-material/MenuOutlined";
+import { useRouter } from "next/navigation";
 
 const Navbar = () => {
+  const router = useRouter();
+
+  const handleRegister = () => {
+    router.push("/manager-sign-up");
+  };
   return (
     <Box
       sx={{
@@ -122,6 +128,7 @@ const Navbar = () => {
             lineHeight: "36px",
             letterSpacing: "0.75px",
           }}
+          onClick={handleRegister}
         >
           Register
         </Button>

@@ -1,3 +1,5 @@
+"use client";
+
 import React from "react";
 import {
   Card,
@@ -9,6 +11,7 @@ import {
   Avatar,
 } from "@mui/material";
 import Divider from "@mui/material/Divider";
+import { useRouter } from "next/navigation";
 
 type PizzaCardProps = {
   pizza: {
@@ -26,6 +29,11 @@ type PizzaCardProps = {
 };
 
 const PizzaCard = (props: PizzaCardProps) => {
+  const router = useRouter();
+  const handleOrder = () => {
+    router.push(`/${props.pizza.id}`);
+  };
+
   return (
     <Card
       sx={{
@@ -153,6 +161,7 @@ const PizzaCard = (props: PizzaCardProps) => {
                   background: "#FF8100",
                   color: "#FDFFFE",
                 }}
+                onClick={handleOrder}
               >
                 <Typography
                   sx={{
