@@ -13,26 +13,44 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+enum OrderStatus {
+  PREPARING
+  DELIVERED
+  READY
+}
+
+enum UserStatus {
+  ACTIVE
+  INACTIVE
+}
+
+enum RoleStatus {
+  ACTIVE
+  INACTIVE
+}
+
 model User {
-  id        String     @id @default(cuid())
-  email     String     @unique
+  id        String      @id @default(cuid())
+  email     String      @unique
   password  String
   name      String
   phone     String
   location  String
-  status    UserStatus @default(ACTIVE)
-  role      Role       @relation(fields: [roleId], references: [id])
+  status    UserStatus  @default(ACTIVE)
+  role      Role        @relation(fields: [roleId], references: [id])
   roleId    String
-  pizzas    Pizza[]
-  Toppings  Topping[]
   Orders    Order[]
-  createdAt DateTime   @default(now())
-  updatedAt DateTime   @updatedAt
+  createdAt DateTime    @default(now())
+  updatedAt DateTime    @updatedAt
+  Resturant Resturant[]
 }
 
 model Role {
   id          String             @id @default(cuid())
+  resturant   Resturant          @relation(fields: [resturantId], references: [id])
+  resturantId String
   name        String             @unique
+  status      RoleStatus         @default(ACTIVE)
   permissions RoleOnPermission[]
   users       User[]
 }
@@ -45,7 +63,7 @@ model Permission {
 }
 
 model RoleOnPermission {
-  id Int @id @default(autoincrement())
+  id String @id @default(cuid())
 
   roleId String
   role   Role   @relation(fields: [roleId], references: [id], onDelete: Cascade)
@@ -56,50 +74,64 @@ model RoleOnPermission {
   @@unique([roleId, permissionId])
 }
 
-model Pizza {
-  id           String   @id @default(cuid())
+model Resturant {
+  id           String    @id @default(cuid())
+  superAdmin   User      @relation(fields: [superAdminId], references: [id])
+  superAdminId String
   name         String
-  toppings     String[]
-  restaurant   User     @relation(fields: [restaurantId], references: [id])
-  restaurantId String
+  location     String
+  phone        String
+  email        String
+  logoUrl      String
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+  Pizza        Pizza[]
+  Topping      Topping[]
+  Role         Role[]
+}
+
+model Pizza {
+  id           String         @id @default(cuid())
+  name         String
   price        Float
   photoUrl     String
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
+  resturant    Resturant      @relation(fields: [resturantId], references: [id])
+  resturantId  String
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime       @updatedAt
+  PizzaTopping PizzaTopping[]
   Order        Order[]
 }
 
 model Topping {
-  id           Int      @id @default(autoincrement())
+  id           Int            @id @default(autoincrement())
+  resturant    Resturant      @relation(fields: [resturantId], references: [id])
+  resturantId  String
   name         String
-  restaurant   User     @relation(fields: [restaurantId], references: [id])
-  restaurantId String
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime       @updatedAt
+  PizzaTopping PizzaTopping[]
+}
+
+model PizzaTopping {
+  id        Int      @id @default(autoincrement())
+  pizza     Pizza    @relation(fields: [pizzaId], references: [id])
+  pizzaId   String
+  topping   Topping  @relation(fields: [toppingId], references: [id])
+  toppingId Int
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model Order {
   id         Int         @id @default(autoincrement())
-  pizza      Pizza       @relation(fields: [pizzaId], references: [id])
-  pizzaId    String
-  toppings   String[]
   customer   User        @relation(fields: [customerId], references: [id])
   customerId String
-  status     OrderStatus @default(PENDING)
+  pizza      Pizza       @relation(fields: [pizzaId], references: [id])
+  pizzaId    String
+  status     OrderStatus @default(PREPARING)
   quantity   Int
   total      Float
   createdAt  DateTime    @default(now())
   updatedAt  DateTime    @updatedAt
-}
-
-enum OrderStatus {
-  PENDING
-  PREPARING
-  DELIVERED
-  CANCELLED
-}
-
-enum UserStatus {
-  ACTIVE
-  DEACTIVATED
 }

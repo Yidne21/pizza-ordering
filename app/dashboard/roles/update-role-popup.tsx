@@ -19,9 +19,7 @@ function UpdateRolePopUp(props: UpdateRolePopUpProps) {
       width="505px"
       height="461px"
     >
-      <form>
-        <Form role={props.role} isEdit={true} />
-      </form>
+      <Form role={props.role} isEdit={true} />
     </CustomModal>
   );
 }

@@ -17,9 +17,7 @@ function AddUserPopUp(props: AddUserPopUpProps) {
       width="654px"
       height="584px"
     >
-      <form>
-        <Form roles={roles} isEdit={false} />
-      </form>
+      <Form roles={roles} isEdit={false} />
     </CustomModal>
   );
 }

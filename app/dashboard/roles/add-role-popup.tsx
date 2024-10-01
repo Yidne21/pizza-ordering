@@ -26,9 +26,7 @@ function AddRolePopUp(props: AddRolePopUpProps) {
       width="505px"
       height="461px"
     >
-      <form>
-        <Form role={role} isEdit={false} />
-      </form>
+      <Form role={role} isEdit={false} />
     </CustomModal>
   );
 }

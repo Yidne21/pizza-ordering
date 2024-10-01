@@ -4,7 +4,14 @@ import { Box } from "@mui/material";
 
 function AddMenu() {
   return (
-    <Box>
+    <Box
+      sx={{
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        width: "100%",
+      }}
+    >
       <AddMenuForm />
     </Box>
   );

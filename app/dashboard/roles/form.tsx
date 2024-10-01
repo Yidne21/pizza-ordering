@@ -3,10 +3,16 @@ import {
   Button,
   Checkbox,
   FormControlLabel,
-  TextField,
   Typography,
 } from "@mui/material";
-import React from "react";
+import React, { useState } from "react";
+import { addRoleSchema } from "@/utils/schema";
+import { addRoleFormTypes } from "@/utils/types";
+import { Controller, useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import InputField from "@/components/ui/input-field";
+import { addRole } from "@/lib/actions";
+import AddOutlinedIcon from "@mui/icons-material/AddOutlined";
 
 type FormProps = {
   isEdit: boolean;
@@ -17,6 +23,40 @@ type FormProps = {
 };
 
 function Form(props: FormProps) {
+  const [isSubmitting, setIsSubmitting] = useState(false); // Track submission state
+  const [addError, setAddError] = useState<string | null>(null); // Track upload errors
+
+  const {
+    register,
+    control,
+    handleSubmit,
+    reset,
+    formState: { errors },
+  } = useForm<addRoleFormTypes>({
+    resolver: zodResolver(addRoleSchema),
+  });
+
+  const handleAddRole = async (data: addRoleFormTypes) => {
+    setIsSubmitting(true);
+    setAddError(null);
+
+    try {
+      const formData = new FormData();
+      formData.append("name", data.name);
+      formData.append("permissions", JSON.stringify(data.permissions));
+
+      const response = await addRole(formData);
+
+      if (response.success) {
+        reset();
+      } else {
+        setAddError(response.message);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
   return (
     <Box
       sx={{
@@ -26,6 +66,8 @@ function Form(props: FormProps) {
         gap: "53px",
         alignSelf: "stretch",
       }}
+      component={"form"}
+      onSubmit={handleSubmit(handleAddRole)}
     >
       <Typography
         sx={{
@@ -41,13 +83,13 @@ function Form(props: FormProps) {
       >
         {props.isEdit ? "Edit Role" : "Add Role"}
       </Typography>
-      <TextField
-        id="outlined-basic"
+      <InputField
         label="Name"
+        name="name"
         type="text"
-        variant="outlined"
-        sx={{ width: "360px" }}
         value={props.role.name}
+        register={register}
+        error={errors.name}
       />
       <Box
         sx={{
@@ -111,18 +153,52 @@ function Form(props: FormProps) {
                 <FormControlLabel
                   key={index}
                   control={
-                    <Checkbox
-                      defaultChecked
-                      sx={{
-                        "&.Mui-checked": {
-                          color: "#FF8100",
-                        },
-                      }}
+                    <Controller
+                      name="permissions"
+                      control={control}
+                      defaultValue={[]}
+                      render={({ field }) => (
+                        <Checkbox
+                          {...field}
+                          value={permission}
+                          checked={field.value.includes(permission)}
+                          onChange={(e) => {
+                            if (e.target.checked) {
+                              field.onChange([...field.value, e.target.value]);
+                            } else {
+                              field.onChange(
+                                field.value.filter(
+                                  (val) => val !== e.target.value
+                                )
+                              );
+                            }
+                          }}
+                          sx={{
+                            "&.Mui-checked": {
+                              color: "#FF8100",
+                            },
+                          }}
+                        />
+                      )}
                     />
                   }
                   label={permission}
                 />
               ))}
+              <Button
+                startIcon={<AddOutlinedIcon />}
+                sx={{
+                  display: "flex",
+                  padding: "5px",
+                  alignItems: "center",
+                  gap: "10px",
+                  borderRadius: "3px",
+                  background: "#FF8100",
+                  color: "#FFF",
+                }}
+              >
+                Add
+              </Button>
             </Box>
           </Box>
         </Box>
@@ -143,9 +219,18 @@ function Form(props: FormProps) {
             lineHeight: "24px", // 109.091%
             letterSpacing: "0.15px",
           }}
+          type="submit"
+          disabled={isSubmitting}
         >
           {props.isEdit ? "Update" : "Add Role"}
         </Button>
+
+        {/* Show upload error if any */}
+        {addError && (
+          <Typography color="error" sx={{ mt: 2 }}>
+            {addError}
+          </Typography>
+        )}
       </Box>
     </Box>
   );

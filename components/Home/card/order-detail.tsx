@@ -15,6 +15,7 @@ import RemoveIcon from "@mui/icons-material/Remove";
 import AddIcon from "@mui/icons-material/Add";
 import ArrowOutwardOutlinedIcon from "@mui/icons-material/ArrowOutwardOutlined";
 import { keyframes } from "@emotion/react";
+import SuccessPopUp from "@/components/ui/success-popup";
 
 // Keyframes for rolling animation
 const rollToActive = keyframes`
@@ -37,6 +38,15 @@ const OrderDetailCard: React.FC = () => {
   const [isRolling, setIsRolling] = useState<boolean>(false);
   const [rollingImage, setRollingImage] = useState<string>("");
   const imageRef = useRef<HTMLImageElement | null>(null);
+  const [open, setOpen] = useState<boolean>(false);
+
+  const handleClose = () => {
+    setOpen(!open);
+  };
+
+  const handleOpen = () => {
+    setOpen(!open);
+  };
 
   const images: string[] = ["/images/featPizza2.png", "/images/featPizza3.png"];
 
@@ -285,6 +295,7 @@ const OrderDetailCard: React.FC = () => {
               alignSelf: "stretch",
               color: "#FDFFFE",
             }}
+            onClick={handleOpen}
           >
             <Typography
               sx={{
@@ -306,6 +317,11 @@ const OrderDetailCard: React.FC = () => {
               }}
             />
           </Button>
+          <SuccessPopUp
+            open={open}
+            onClose={handleClose}
+            message="Your order has been successfully completed!"
+          />
         </Box>
       </CardContent>
     </Card>

@@ -50,40 +50,11 @@ export const LoginSchema = z.object({
   }),
 });
 
-export const createBookSchema = z.object({
-  bookName: z.string().min(1, { message: "Book name is required!" }),
-  author: z.string().min(1, { message: "Author name is required!" }),
-  category: z.string({ message: "Category is required!" }),
-  quantity: z
-    .number({ invalid_type_error: "Quantity must be a number" })
-    .min(1, "Quantity must be at least 1"),
-  rentPrice: z
-    .number({ invalid_type_error: "Rent Price must be a number" })
-    .min(0, "Rent price must be at least 0"),
-  coverPhotoUrl: z
-    .any()
-    .refine((files) => files instanceof FileList && files.length > 0, {
-      message: "Image is required",
-    }),
-});
-
-export const updateBookSchema = z.object({
-  bookName: z.string().min(1, { message: "Book name is required!" }).optional(),
-  author: z.string().min(1, { message: "Author name is required!" }).optional(),
-  category: z
-    .enum(["Fantasy", "Science", "Business"], {
-      message: "Category is required!",
-    })
-    .optional(),
-  quantity: z
-    .number({ invalid_type_error: "Quantity must be a number" })
-    .min(1, "Quantity must be at least 1")
-    .optional(),
-  rentPrice: z
-    .number({ invalid_type_error: "Rent Price must be a number" })
-    .min(0, "Rent price must be at least 0")
-    .optional(),
-  coverPhotoUrl: z
+export const addMenuSchema = z.object({
+  name: z.string().min(1, { message: "menu name is required!" }),
+  price: z.number().min(1, { message: "price is required!" }),
+  toppings: z.array(z.string()).min(1, { message: "topping is required!" }),
+  logo: z
     .any()
     .optional()
     .refine(
@@ -94,4 +65,32 @@ export const updateBookSchema = z.object({
         message: "Image is required",
       }
     ),
+});
+
+export const addRoleSchema = z.object({
+  name: z.string().min(1, { message: "role name is required!" }),
+  permissions: z
+    .array(z.string())
+    .min(1, { message: "permissions is required!" }),
+});
+
+export const addUserSchema = z.object({
+  name: z.string().min(2, {
+    message: "please enter name",
+  }),
+  email: z.string().email({
+    message: "please enter valid email",
+  }),
+  location: z.string().min(2, {
+    message: "please enter location",
+  }),
+  phoneNumber: z.string().min(6, {
+    message: "please enter phone Number",
+  }),
+  role: z.string().min(2, {
+    message: "please select role",
+  }),
+  password: z.string().min(6, {
+    message: "Password must be at least 6 characters long",
+  }),
 });

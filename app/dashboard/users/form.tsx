@@ -1,13 +1,21 @@
-import React from "react";
+"use client";
+
+import React, { useState } from "react";
 import {
-  TextField,
   Button,
   Box,
   FormControl,
   Select,
   MenuItem,
   ListItemText,
+  Typography,
 } from "@mui/material";
+import InputField from "@/components/ui/input-field";
+import { Controller, useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { addUserFormTypes } from "@/utils/types";
+import { addUserSchema } from "@/utils/schema";
+import { addUser } from "@/lib/actions";
 
 type FormProps = {
   roles: string[];
@@ -15,6 +23,44 @@ type FormProps = {
 };
 
 function Form(props: FormProps) {
+  const [isSubmitting, setIsSubmitting] = useState(false); // Track submission state
+  const [addError, setAddError] = useState<string | null>(null); // Track upload errors
+
+  const {
+    register,
+    control,
+    handleSubmit,
+    reset,
+    formState: { errors },
+  } = useForm<addUserFormTypes>({
+    resolver: zodResolver(addUserSchema),
+  });
+
+  const handleAddUser = async (data: addUserFormTypes) => {
+    setIsSubmitting(true);
+    setAddError(null);
+
+    try {
+      const formData = new FormData();
+      formData.append("name", data.name);
+      formData.append("email", data.email);
+      formData.append("location", data.location);
+      formData.append("phoneNumber", data.phoneNumber);
+      formData.append("password", data.password);
+      formData.append("role", data.role);
+
+      const response = await addUser(formData);
+
+      if (response.success) {
+        reset();
+      } else {
+        setAddError(response.message);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
   return (
     <Box
       sx={{
@@ -25,43 +71,43 @@ function Form(props: FormProps) {
         padding: "30px",
         width: "100%",
       }}
+      component="form"
+      onSubmit={handleSubmit(handleAddUser)}
     >
-      <TextField
-        id="name"
+      <InputField
+        register={register}
+        error={errors.name}
+        name="name"
         label="Name"
         type="text"
-        variant="outlined"
-        fullWidth
       />
-      <TextField
-        fullWidth
-        id="outlined-basic"
+      <InputField
+        register={register}
+        error={errors.email}
+        name="email"
         label="Email"
         type="email"
-        variant="outlined"
       />
-      <TextField
-        fullWidth
-        id="outlined-basic"
+      <InputField
+        register={register}
+        error={errors.location}
+        name="location"
         label="Location"
         type="text"
-        variant="outlined"
       />
-
-      <TextField
-        fullWidth
-        id="outlined-basic"
+      <InputField
+        register={register}
+        error={errors.phoneNumber}
+        name="phoneNumber"
         label="Phone Number"
         type="text"
-        variant="outlined"
       />
-
-      <TextField
-        fullWidth
-        id="outlined-basic"
+      <InputField
+        register={register}
+        error={errors.password}
+        name="password"
         label="Password"
         type="password"
-        variant="outlined"
       />
 
       <Box
@@ -73,43 +119,50 @@ function Form(props: FormProps) {
         }}
       >
         <FormControl>
-          <Select
-            label="Select Role"
-            value={props.roles[0]}
-            renderValue={(value) => value}
-            sx={{
-              "& .MuiSelect-icon": {
-                color: "#000",
-                width: "24px",
-                height: "24px",
-              },
-              width: "223px",
-              color: "#000",
-            }}
-          >
-            {props.roles.map((role) => (
-              <MenuItem key={role} value={role}>
-                <ListItemText
-                  primary={role}
-                  primaryTypographyProps={{
-                    sx: {
-                      color: "#000",
-                      textAlign: "center",
-                      fontFeatureSettings: "'liga' off, 'clig' off",
-                      fontFamily: "Roboto",
-                      fontSize: "12px",
-                      fontStyle: "normal",
-                      fontWeight: 400,
-                      lineHeight: "20px", // 166.667%
-                      letterSpacing: "0.25px",
-                    },
-                  }}
-                />
-              </MenuItem>
-            ))}
-          </Select>
+          <Controller
+            name="role" // Register 'role' field
+            control={control}
+            defaultValue={props.roles[0]} // Set default value to first role
+            render={({ field }) => (
+              <Select
+                {...field}
+                label="Select Role"
+                value={field.value} // Controlled by react-hook-form
+                onChange={field.onChange} // Handle changes
+                sx={{
+                  "& .MuiSelect-icon": {
+                    color: "#000",
+                    width: "24px",
+                    height: "24px",
+                  },
+                  width: "223px",
+                  color: "#000",
+                }}
+              >
+                {props.roles.map((role) => (
+                  <MenuItem key={role} value={role}>
+                    <ListItemText
+                      primary={role}
+                      primaryTypographyProps={{
+                        sx: {
+                          color: "#000",
+                          textAlign: "center",
+                          fontFeatureSettings: "'liga' off, 'clig' off",
+                          fontFamily: "Roboto",
+                          fontSize: "12px",
+                          fontStyle: "normal",
+                          fontWeight: 400,
+                          lineHeight: "20px", // 166.667%
+                          letterSpacing: "0.25px",
+                        },
+                      }}
+                    />
+                  </MenuItem>
+                ))}
+              </Select>
+            )}
+          />
         </FormControl>
-
         <Button
           variant="contained"
           sx={{
@@ -133,9 +186,16 @@ function Form(props: FormProps) {
             letterSpacing: "0.15px",
             textTransform: "capitalize",
           }}
+          type="submit"
+          disabled={isSubmitting}
         >
           {props.isEdit ? "Edit" : "Add"}
         </Button>
+        {addError && (
+          <Typography color="error" sx={{ mt: 2 }}>
+            {addError}
+          </Typography>
+        )}
       </Box>
     </Box>
   );
