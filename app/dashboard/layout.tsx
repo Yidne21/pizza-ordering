@@ -15,7 +15,9 @@ export default function Layout({
       sx={{
         display: "flex",
         width: "100%",
-        height: "100vh",
+        height: "100%",
+        minHeight: "100vh",
+        backgroundColor: "#F8F8F8",
       }}
     >
       <Box
@@ -45,7 +47,7 @@ export default function Layout({
           sx={{
             m: "20px",
             padding: "49px 46px 50px 47px",
-            boxShadow: "0px 0px 15px 0px rgba(0, 0, 0, 0.5)",
+            // boxShadow: "0px 0px 15px 0px rgba(0, 0, 0, 0.5)",
             display: "inline-flex",
             justifyContent: "flex-start",
             alignItems: "flex-start",

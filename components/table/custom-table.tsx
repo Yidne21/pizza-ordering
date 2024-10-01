@@ -10,6 +10,7 @@ import {
 } from "material-react-table";
 import { Box, Button, Typography } from "@mui/material";
 import AddRolePopUp from "@/app/dashboard/roles/add-role-popup";
+import AddUserPopUp from "@/app/dashboard/users/add-user-popup";
 
 type CustomeTableProps<T extends MRT_RowData> = {
   data: T[]; // Data is passed as a prop, assuming it's fetched via SSR
@@ -99,6 +100,7 @@ const CustomeTable = <T extends MRT_RowData>({
               >
                 Add users
               </Button>
+              <AddUserPopUp open={open} onClose={handleModalClose} />
             </>
           )}
 
@@ -173,7 +175,6 @@ const CustomeTable = <T extends MRT_RowData>({
         maxHeight,
         display: "flex",
         flexDirection: "column",
-        justifyContent: "space-between",
         width: "100%",
       },
     },

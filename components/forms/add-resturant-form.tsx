@@ -62,7 +62,7 @@ const AddResturantForm = () => {
             background: "#FF8100",
           }}
         >
-          CONTINUE
+          continue
         </Button>
       </form>
     </>

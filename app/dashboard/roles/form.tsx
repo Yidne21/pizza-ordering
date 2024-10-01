@@ -43,10 +43,11 @@ function Form(props: FormProps) {
       </Typography>
       <TextField
         id="outlined-basic"
-        label="Role"
+        label="Name"
         type="text"
         variant="outlined"
         sx={{ width: "360px" }}
+        value={props.role.name}
       />
       <Box
         sx={{
