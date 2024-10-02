@@ -5,6 +5,7 @@ import Image from "next/image";
 import { CustomLink } from "@/app/custom-link";
 import MenuOutlinedIcon from "@mui/icons-material/MenuOutlined";
 import { useRouter } from "next/navigation";
+import { useSession } from "next-auth/react";
 
 const Navbar = () => {
   const router = useRouter();
@@ -12,6 +13,11 @@ const Navbar = () => {
   const handleRegister = () => {
     router.push("/manager-sign-up");
   };
+
+  const { data } = useSession();
+
+  console.log(data);
+
   return (
     <Box
       sx={{
@@ -81,19 +87,22 @@ const Navbar = () => {
           </Typography>
         </CustomLink>
 
-        <CustomLink href="/orders">
-          <Typography
-            sx={{
-              fontFamily: "Inter",
-              fontSize: { xs: "13px", sm: "18px", md: "23px", lg: "25px" },
-              fontWeight: "700px",
-              lineHeight: "36px",
-              letterSpacing: "0.75px",
-            }}
-          >
-            Orders
-          </Typography>
-        </CustomLink>
+        {data?.user && (
+          <CustomLink href="/orders">
+            <Typography
+              sx={{
+                fontFamily: "Inter",
+                fontSize: { xs: "13px", sm: "18px", md: "23px", lg: "25px" },
+                fontWeight: "700px",
+                lineHeight: "36px",
+                letterSpacing: "0.75px",
+              }}
+            >
+              Orders
+            </Typography>
+          </CustomLink>
+        )}
+
         <Box sx={{ display: { xs: "none", sm: "none", md: "flex" } }}>
           <CustomLink href="/about">
             <Typography

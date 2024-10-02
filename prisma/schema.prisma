@@ -33,7 +33,7 @@ model User {
   id        String      @id @default(cuid())
   email     String      @unique
   password  String
-  name      String
+  name      String?
   phone     String
   location  String
   status    UserStatus  @default(ACTIVE)
@@ -46,13 +46,12 @@ model User {
 }
 
 model Role {
-  id          String             @id @default(cuid())
-  resturant   Resturant          @relation(fields: [resturantId], references: [id])
-  resturantId String
-  name        String             @unique
-  status      RoleStatus         @default(ACTIVE)
-  permissions RoleOnPermission[]
-  users       User[]
+  id            String             @id @default(cuid())
+  name          String             @unique
+  status        RoleStatus         @default(ACTIVE)
+  permissions   RoleOnPermission[]
+  users         User[]
+  ResturantRole ResturantRole[]
 }
 
 model Permission {
@@ -74,20 +73,30 @@ model RoleOnPermission {
   @@unique([roleId, permissionId])
 }
 
+model ResturantRole {
+  id          String    @id @default(cuid())
+  resturant   Resturant @relation(fields: [resturantId], references: [id])
+  resturantId String
+  role        Role      @relation(fields: [roleId], references: [id])
+  roleId      String
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+}
+
 model Resturant {
-  id           String    @id @default(cuid())
-  superAdmin   User      @relation(fields: [superAdminId], references: [id])
-  superAdminId String
-  name         String
-  location     String
-  phone        String
-  email        String
-  logoUrl      String
-  createdAt    DateTime  @default(now())
-  updatedAt    DateTime  @updatedAt
-  Pizza        Pizza[]
-  Topping      Topping[]
-  Role         Role[]
+  id            String          @id @default(cuid())
+  superAdmin    User            @relation(fields: [superAdminId], references: [id])
+  superAdminId  String
+  name          String
+  location      String
+  phone         String
+  email         String
+  logoUrl       String
+  createdAt     DateTime        @default(now())
+  updatedAt     DateTime        @updatedAt
+  Pizza         Pizza[]
+  Topping       Topping[]
+  ResturantRole ResturantRole[]
 }
 
 model Pizza {

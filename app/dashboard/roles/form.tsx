@@ -12,7 +12,6 @@ import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import InputField from "@/components/ui/input-field";
 import { addRole } from "@/lib/actions";
-import AddOutlinedIcon from "@mui/icons-material/AddOutlined";
 
 type FormProps = {
   isEdit: boolean;
@@ -185,20 +184,6 @@ function Form(props: FormProps) {
                   label={permission}
                 />
               ))}
-              <Button
-                startIcon={<AddOutlinedIcon />}
-                sx={{
-                  display: "flex",
-                  padding: "5px",
-                  alignItems: "center",
-                  gap: "10px",
-                  borderRadius: "3px",
-                  background: "#FF8100",
-                  color: "#FFF",
-                }}
-              >
-                Add
-              </Button>
             </Box>
           </Box>
         </Box>

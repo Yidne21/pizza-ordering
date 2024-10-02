@@ -1,22 +1,55 @@
 "use client";
 
-import {
-  Box,
-  Button,
-  Checkbox,
-  Divider,
-  TextField,
-  Typography,
-} from "@mui/material";
+import { Box, Button, Checkbox, Divider, Typography } from "@mui/material";
 import Link from "next/link";
-
 import { useSearchParams } from "next/navigation";
+import { useState } from "react";
+import { LoginSchema } from "@/utils/schema";
+import { LoginFormTypes } from "@/utils/types";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import InputField from "@/components/ui/input-field";
+import { authenticate } from "@/lib/actions";
 
 const label = { inputProps: { "aria-label": "Checkbox demo" } };
 const LoginForm = () => {
   const router = useSearchParams();
-
   const page = router.get("page");
+
+  const [isSubmitting, setIsSubmitting] = useState(false); // Track submission state
+  const [loginError, setLoginError] = useState<string | null | undefined>(null); // Track upload errors
+
+  const {
+    register,
+    handleSubmit,
+    reset,
+    formState: { errors },
+  } = useForm<LoginFormTypes>({
+    resolver: zodResolver(LoginSchema),
+  });
+
+  const handleLogin = async (data: LoginFormTypes) => {
+    setIsSubmitting(true);
+    setLoginError(null);
+
+    try {
+      const formData = new FormData();
+      formData.append("email", data.email);
+      formData.append("password", data.password);
+
+      const response = await authenticate(formData);
+
+      if (response?.success) {
+        reset();
+        setIsSubmitting(false);
+      } else {
+        setLoginError(response?.message);
+        setIsSubmitting(false);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
   return (
     <>
@@ -37,25 +70,29 @@ const LoginForm = () => {
       </Typography>
       <Divider variant="fullWidth" sx={{ width: "100%" }} />
 
-      <form
-        style={{
+      <Box
+        sx={{
           display: "flex",
           flexDirection: "column",
-          gap: 20,
-          marginTop: 20,
+          gap: "20px",
+          mt: "20px",
         }}
+        component="form"
+        onSubmit={handleSubmit(handleLogin)}
       >
-        <TextField
-          id="outlined-basic"
+        <InputField
+          register={register}
+          error={errors.email}
+          name="email"
           label="Email address"
           type="email"
-          variant="outlined"
         />
-        <TextField
-          id="outlined-basic"
+        <InputField
+          register={register}
+          error={errors.password}
+          name="password"
           label="Password"
           type="password"
-          variant="outlined"
         />
 
         <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
@@ -70,9 +107,16 @@ const LoginForm = () => {
             width: "100%",
             background: "#FF8100",
           }}
+          disabled={isSubmitting}
         >
           LOGIN
         </Button>
+
+        {loginError && (
+          <Typography sx={{ color: "red", textAlign: "center" }}>
+            {loginError}
+          </Typography>
+        )}
 
         <Box sx={{ display: "flex", justifyContent: "center" }}>
           <Typography>Have not have an account?</Typography>
@@ -80,7 +124,7 @@ const LoginForm = () => {
             Sign up
           </Link>
         </Box>
-      </form>
+      </Box>
     </>
   );
 };

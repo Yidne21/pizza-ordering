@@ -18,12 +18,47 @@ export const { auth, signIn, signOut } = NextAuth({
 
         if (parsedCredentials.success) {
           const { email, password } = parsedCredentials.data;
-          const user = await prisma.user.findUnique({ where: { email } });
+          const user = await prisma.user.findUnique({
+            where: { email },
+            select: {
+              id: true,
+              email: true,
+              password: true,
+              role: {
+                select: {
+                  id: false,
+                  name: true,
+                  permissions: {
+                    select: {
+                      permission: {
+                        select: {
+                          id: false,
+                          action: true,
+                          subject: true,
+                        },
+                      },
+                    },
+                  },
+                },
+              },
+            },
+          });
           if (!user) return null;
 
           const passwordsMatch = await bcrypt.compare(password, user.password);
 
-          if (passwordsMatch) return user;
+          if (passwordsMatch) {
+            const cleanedUser = {
+              id: user.id,
+              role: {
+                name: user.role.name,
+                permissions: user.role.permissions.map(
+                  (permission) => permission.permission
+                ),
+              },
+            };
+            return cleanedUser;
+          }
         }
 
         return null;
