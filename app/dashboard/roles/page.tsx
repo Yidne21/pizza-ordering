@@ -1,4 +1,8 @@
 import RoleTable from "./role-table";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/auth";
+import { createAbility } from "@/abilities/abilities";
+import { redirect } from "next/navigation";
 
 const data = [
   {
@@ -17,7 +21,21 @@ const data = [
   },
 ];
 
-function Roles() {
+async function Roles() {
+  const session = await getServerSession(authOptions);
+
+  if (!session) {
+    redirect("/login");
+  }
+
+  const { role } = session.user;
+
+  const ability = createAbility(role.permissions);
+
+  if (!ability.can("read", "Role")) {
+    redirect("/403");
+  }
+
   return (
     <>
       <RoleTable data={data} />

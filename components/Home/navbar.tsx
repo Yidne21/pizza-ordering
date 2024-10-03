@@ -5,6 +5,8 @@ import Image from "next/image";
 import { CustomLink } from "@/app/custom-link";
 import MenuOutlinedIcon from "@mui/icons-material/MenuOutlined";
 import { useRouter } from "next/navigation";
+import { useSession } from "next-auth/react";
+import { signOut } from "next-auth/react";
 
 const Navbar = () => {
   const router = useRouter();
@@ -12,6 +14,20 @@ const Navbar = () => {
   const handleRegister = () => {
     router.push("/manager-sign-up");
   };
+
+  const handleLogout = async () => {
+    signOut({
+      callbackUrl: "/",
+    });
+  };
+
+  const { data: session } = useSession();
+
+  let role;
+
+  if (session) {
+    role = session?.user?.role?.name;
+  }
 
   return (
     <Box
@@ -117,23 +133,69 @@ const Navbar = () => {
           display: { xs: "none", sm: "none", md: "flex" },
         }}
       >
-        <Button
-          variant="contained"
-          sx={{
-            background: "#FF890F",
-            color: "#FFFF",
-            padding: "10px 20px",
-            borderRadius: "5px",
-            fontFamily: "Inter",
-            fontSize: "25px",
-            fontWeight: 700,
-            lineHeight: "36px",
-            letterSpacing: "0.75px",
-          }}
-          onClick={handleRegister}
-        >
-          Register
-        </Button>
+        {!role && (
+          <Button
+            variant="contained"
+            sx={{
+              background: "#FF890F",
+              color: "#FFFF",
+              padding: "10px 20px",
+              borderRadius: "5px",
+              fontFamily: "Inter",
+              fontSize: "25px",
+              fontWeight: 700,
+              lineHeight: "36px",
+              letterSpacing: "0.75px",
+              textTransform: "capitalize",
+            }}
+            onClick={handleRegister}
+          >
+            Register
+          </Button>
+        )}
+
+        {role && role != "customer" && (
+          <CustomLink href="/dashboard">
+            <Button
+              variant="contained"
+              sx={{
+                background: "#FF890F",
+                color: "#FFFF",
+                padding: "10px 20px",
+                borderRadius: "5px",
+                fontFamily: "Inter",
+                fontSize: "25px",
+                fontWeight: 700,
+                lineHeight: "36px",
+                letterSpacing: "0.75px",
+                textTransform: "capitalize",
+              }}
+            >
+              Dashboard
+            </Button>
+          </CustomLink>
+        )}
+
+        {role && role === "customer" && (
+          <Button
+            variant="contained"
+            sx={{
+              background: "#FF890F",
+              color: "#FFFF",
+              padding: "10px 20px",
+              borderRadius: "5px",
+              fontFamily: "Inter",
+              fontSize: "25px",
+              fontWeight: 700,
+              lineHeight: "36px",
+              letterSpacing: "0.75px",
+              textTransform: "capitalize",
+            }}
+            onClick={handleLogout}
+          >
+            Logout
+          </Button>
+        )}
       </Box>
       <Box
         sx={{

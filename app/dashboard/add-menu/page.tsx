@@ -1,8 +1,26 @@
 import React from "react";
 import AddMenuForm from "./add-menu-form";
 import { Box } from "@mui/material";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/auth";
+import { createAbility } from "@/abilities/abilities";
+import { redirect } from "next/navigation";
 
-function AddMenu() {
+async function AddMenu() {
+  const session = await getServerSession(authOptions);
+
+  if (!session) {
+    redirect("/login");
+  }
+
+  const { role } = session.user;
+
+  const ability = createAbility(role.permissions);
+
+  if (!ability.can("create", "Menu")) {
+    redirect("/403");
+  }
+
   return (
     <Box
       sx={{

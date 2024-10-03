@@ -3,14 +3,23 @@ import OrderDetailCard from "@/components/Home/card/order-detail";
 import { Box } from "@mui/material";
 import RelatedPizza from "@/components/Home/related-pzza";
 
-function OrderDetail() {
+interface OrderDetailPageProps {
+  params: {
+    pizzaId: string;
+  };
+}
+
+function OrderDetail({ params }: OrderDetailPageProps) {
+  const { pizzaId } = params;
+  console.log(pizzaId, "%%%%%%");
+
   return (
     <Box
       sx={{
         background: "#FFF8F1",
       }}
     >
-      <OrderDetailCard />
+      <OrderDetailCard pizzaId={pizzaId} />
       <RelatedPizza />
     </Box>
   );

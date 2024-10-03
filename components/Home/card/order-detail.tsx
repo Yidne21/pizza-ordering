@@ -16,6 +16,11 @@ import AddIcon from "@mui/icons-material/Add";
 import ArrowOutwardOutlinedIcon from "@mui/icons-material/ArrowOutwardOutlined";
 import { keyframes } from "@emotion/react";
 import SuccessPopUp from "@/components/ui/success-popup";
+import { Controller, useForm } from "react-hook-form";
+import { orderSchema } from "@/utils/schema";
+import { orderFormTypes } from "@/utils/types";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { orderActions } from "@/lib/customerActions";
 
 // Keyframes for rolling animation
 const rollToActive = keyframes`
@@ -29,9 +34,20 @@ const rollToActive = keyframes`
   }
 `;
 
+const orderDetails = {
+  name: "Margherita",
+  price: 150,
+  toppings: ["Cheese", "Tomato", "Mushroom", "Onion", "Capsicum"],
+  images: ["/images/featPizza2.png", "/images/featPizza3.png"],
+};
+
 const toppings = ["Cheese", "Tomato", "Mushroom", "Onion", "Capsicum"];
 
-const OrderDetailCard: React.FC = () => {
+interface OrderDetail {
+  pizzaId: string;
+}
+
+function OrderDetailCard({ pizzaId }: OrderDetail) {
   const [activeImage, setActiveImage] = useState<string>(
     "/images/featPizza2.png"
   );
@@ -39,17 +55,65 @@ const OrderDetailCard: React.FC = () => {
   const [rollingImage, setRollingImage] = useState<string>("");
   const imageRef = useRef<HTMLImageElement | null>(null);
   const [open, setOpen] = useState<boolean>(false);
-
-  const handleClose = () => {
-    setOpen(!open);
-  };
+  const [Quantity, setQuantity] = useState<number>(1);
+  const [totalPrice, setTotalPrice] = useState<number>(orderDetails.price);
+  const [isSubmitting, setIsSubmitting] = useState(false); // Track submission state
+  const [orderError, setOrderError] = useState<string | null>(null); // Track upload errors
 
   const handleOpen = () => {
     setOpen(!open);
   };
 
-  const images: string[] = ["/images/featPizza2.png", "/images/featPizza3.png"];
+  const handleClose = () => {
+    setOpen(!open);
+  };
 
+  const { control, handleSubmit, reset } = useForm<orderFormTypes>({
+    resolver: zodResolver(orderSchema),
+  });
+
+  const handleOrder = async (data: orderFormTypes) => {
+    setIsSubmitting(true);
+    setOrderError(null);
+
+    try {
+      const formData = new FormData();
+      formData.append("toppings", JSON.stringify(data.toppings));
+      formData.append("pizzaId", pizzaId);
+      formData.append("total", totalPrice.toString());
+      formData.append("quantity", Quantity.toString());
+
+      const response = await orderActions(formData); // Call the server action
+
+      if (response.success) {
+        setOpen(true); // Open success popup
+        reset(); // Reset form after successful submission
+      } else {
+        setOrderError(response.message); // Show error if upload fails
+      }
+    } catch (error) {
+      console.log(error);
+      setOrderError("Something went wrong.");
+    } finally {
+      setIsSubmitting(false);
+    }
+    handleOpen();
+    reset();
+  };
+
+  const handleAdd = () => {
+    const newQuantity = Quantity + 1;
+    const newPrice = orderDetails.price * newQuantity;
+    setQuantity(newQuantity);
+    setTotalPrice(newPrice);
+  };
+  const handleRemove = () => {
+    const newQuantity = Quantity - 1;
+    const newPrice = totalPrice - orderDetails.price;
+    if (newQuantity < 1) return;
+    setQuantity(newQuantity);
+    setTotalPrice(newPrice);
+  };
   // Handle the image click to trigger animation
   const handleImageClick = (image: string) => {
     setRollingImage(image);
@@ -68,6 +132,8 @@ const OrderDetailCard: React.FC = () => {
         p: { xs: "20px", lg: "51px" },
         background: "#FFF8F1",
       }}
+      component={"form"}
+      onSubmit={handleSubmit(handleOrder)}
     >
       <CardContent
         sx={{
@@ -112,7 +178,7 @@ const OrderDetailCard: React.FC = () => {
               flexDirection: "column",
             }}
           >
-            {images.map((image, index) => (
+            {orderDetails.images.map((image, index) => (
               <CardMedia
                 key={index}
                 component="img"
@@ -191,13 +257,33 @@ const OrderDetailCard: React.FC = () => {
               <FormControlLabel
                 key={index}
                 control={
-                  <Checkbox
-                    defaultChecked
-                    sx={{
-                      "&.Mui-checked": {
-                        color: "#FF8100",
-                      },
-                    }}
+                  <Controller
+                    name="toppings"
+                    control={control}
+                    defaultValue={[]}
+                    render={({ field }) => (
+                      <Checkbox
+                        {...field}
+                        value={topping}
+                        checked={field.value.includes(topping)}
+                        onChange={(e) => {
+                          if (e.target.checked) {
+                            field.onChange([...field.value, e.target.value]);
+                          } else {
+                            field.onChange(
+                              field.value.filter(
+                                (val) => val !== e.target.value
+                              )
+                            );
+                          }
+                        }}
+                        sx={{
+                          "&.Mui-checked": {
+                            color: "#FF8100",
+                          },
+                        }}
+                      />
+                    )}
                   />
                 }
                 label={topping}
@@ -227,6 +313,7 @@ const OrderDetailCard: React.FC = () => {
                   border: "1px solid #FF8100",
                   background: "#FFF",
                 }}
+                onClick={handleRemove}
               >
                 <RemoveIcon
                   sx={{ color: "#000", width: "40px", height: "40px" }}
@@ -242,7 +329,7 @@ const OrderDetailCard: React.FC = () => {
                   letterSpacing: { xs: "0.1px", lg: "0.2px" },
                 }}
               >
-                1
+                {Quantity}
               </Typography>
               <Button
                 sx={{
@@ -250,6 +337,7 @@ const OrderDetailCard: React.FC = () => {
                   border: "1px solid #FF8100",
                   background: "#FFF",
                 }}
+                onClick={handleAdd}
               >
                 <AddIcon
                   sx={{ color: "#000", width: "40px", height: "40px" }}
@@ -267,7 +355,7 @@ const OrderDetailCard: React.FC = () => {
                   letterSpacing: "1.35px",
                 }}
               >
-                150
+                {totalPrice}
               </Typography>
               <Typography
                 sx={{
@@ -295,7 +383,8 @@ const OrderDetailCard: React.FC = () => {
               alignSelf: "stretch",
               color: "#FDFFFE",
             }}
-            onClick={handleOpen}
+            type="submit"
+            disabled={isSubmitting}
           >
             <Typography
               sx={{
@@ -317,6 +406,22 @@ const OrderDetailCard: React.FC = () => {
               }}
             />
           </Button>
+
+          {/* Error Message */}
+
+          {orderError && (
+            <Typography
+              sx={{
+                color: "red",
+                textAlign: "center",
+              }}
+            >
+              {orderError}
+            </Typography>
+          )}
+
+          {/* Success Popup */}
+
           <SuccessPopUp
             open={open}
             onClose={handleClose}
@@ -326,6 +431,6 @@ const OrderDetailCard: React.FC = () => {
       </CardContent>
     </Card>
   );
-};
+}
 
 export default OrderDetailCard;

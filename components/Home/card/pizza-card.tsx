@@ -31,7 +31,7 @@ type PizzaCardProps = {
 const PizzaCard = (props: PizzaCardProps) => {
   const router = useRouter();
   const handleOrder = () => {
-    router.push(`/${props.pizza.id}`);
+    router.push(`order/${props.pizza.id}`);
   };
 
   return (

@@ -31,6 +31,7 @@ const CustomerSignUpForm = () => {
 
     try {
       const formData = new FormData();
+      formData.append("name", data.name);
       formData.append("email", data.email);
       formData.append("password", data.password);
       formData.append("location", data.location);
@@ -50,7 +51,7 @@ const CustomerSignUpForm = () => {
 
   return (
     <Box
-      sx={{ display: "flex", flexDirection: "column", gap: "20px", mt: "20px" }}
+      sx={{ display: "flex", flexDirection: "column", gap: "10px", mt: "10px" }}
       component="form"
       onSubmit={handleSubmit(handleCustomerSignUp)}
     >

@@ -5,6 +5,7 @@ import PizzaSection from "./pizza-section";
 
 const pizzaData = [
   {
+    id: "1",
     name: "Margherita",
     description: "Tomato, Mozzarella, Bell Peppers, Onions, Olives",
     price: 150,
@@ -13,6 +14,7 @@ const pizzaData = [
     restaurantAvatar: "/images/ava.svg",
   },
   {
+    id: "188",
     name: "Pepperoni",
     description: "Tomato, Mozzarella, Pepperoni",
     price: 180,
@@ -21,6 +23,8 @@ const pizzaData = [
     restaurantAvatar: "/images/pepperoni.svg",
   },
   {
+    id: "2",
+
     name: "BBQ Chicken",
     description: "BBQ sauce, Chicken, Mozzarella",
     price: 200,
@@ -30,6 +34,8 @@ const pizzaData = [
   },
 
   {
+    id: "3",
+
     name: "Pepperoni",
     description: "Tomato, Mozzarella, Pepperoni",
     price: 180,
@@ -38,6 +44,8 @@ const pizzaData = [
     restaurantAvatar: "/images/pepperoni.svg",
   },
   {
+    id: "4",
+
     name: "BBQ Chicken",
     description: "BBQ sauce, Chicken, Mozzarella",
     price: 200,

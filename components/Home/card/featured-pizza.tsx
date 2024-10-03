@@ -4,9 +4,11 @@ import React from "react";
 import { Box, Typography, Button } from "@mui/material";
 import Image from "next/image";
 import { StaticImageData } from "next/image";
+import { useRouter } from "next/navigation";
 
 type FeaturedPizzaCardProps = {
   pizza: {
+    id: string;
     desc: string;
     imagePath: string | StaticImageData;
     background: string;
@@ -15,6 +17,10 @@ type FeaturedPizzaCardProps = {
 };
 
 export default function FeaturedPizzaCard({ pizza }: FeaturedPizzaCardProps) {
+  const router = useRouter();
+  const handleOrder = () => {
+    router.push(`order/${pizza.id}`);
+  };
   return (
     <Box
       sx={{
@@ -91,6 +97,7 @@ export default function FeaturedPizzaCard({ pizza }: FeaturedPizzaCardProps) {
             py: { xs: "10px", sm: "10px", md: "13px", lg: "15px" },
             borderRadius: "5px",
           }}
+          onClick={handleOrder}
         >
           <Typography
             sx={{

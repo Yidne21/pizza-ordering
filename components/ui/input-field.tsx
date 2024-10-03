@@ -1,4 +1,4 @@
-import { TextField, Typography, TextFieldProps } from "@mui/material";
+import { TextField, Typography } from "@mui/material";
 import {
   FieldError,
   UseFormRegister,
@@ -12,8 +12,8 @@ type InputFieldProps<T extends FieldValues> = {
   name: keyof T; // This ensures `name` is a key from the form's type
   register: UseFormRegister<T>;
   error?: FieldError;
-  InputLabelProps?: TextFieldProps["InputLabelProps"];
   value?: string;
+  size?: "small" | "medium";
 };
 
 const InputField = <T extends FieldValues>({
@@ -22,8 +22,8 @@ const InputField = <T extends FieldValues>({
   name,
   register,
   error,
-  InputLabelProps,
   value,
+  size,
 }: InputFieldProps<T>) => {
   return (
     <>
@@ -32,11 +32,14 @@ const InputField = <T extends FieldValues>({
         label={label}
         type={type}
         variant="outlined"
-        InputLabelProps={InputLabelProps}
         value={value}
+        fullWidth
+        size={size}
       />
       {error?.message && (
-        <Typography sx={{ color: "red" }}>{error.message}</Typography>
+        <Typography sx={{ color: "red", fontSize: "12px" }}>
+          {error.message}
+        </Typography>
       )}
     </>
   );

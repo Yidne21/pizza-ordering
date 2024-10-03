@@ -7,6 +7,9 @@ export enum UserRole {
 
 export const customerSignUp = z
   .object({
+    name: z.string().email({
+      message: "please enter your name",
+    }),
     email: z.string().email({
       message: "please enter valid email",
     }),
@@ -93,6 +96,10 @@ export const addMenuSchema = z.object({
         message: "Image is required",
       }
     ),
+});
+
+export const orderSchema = z.object({
+  toppings: z.array(z.string()).min(1, { message: "topping is required!" }),
 });
 
 export const addRoleSchema = z.object({

@@ -5,6 +5,19 @@ import { z } from "zod";
 import Credentials from "next-auth/providers/credentials";
 import { NextAuthOptions } from "next-auth";
 
+// Define the User interface
+interface User {
+  id: string;
+  email: string;
+  role: {
+    name: string;
+    permissions: {
+      action: string;
+      subject: string;
+    }[];
+  };
+}
+
 export const authOptions: NextAuthOptions = {
   providers: [
     Credentials({
@@ -13,57 +26,66 @@ export const authOptions: NextAuthOptions = {
         email: { label: "Email", type: "email" },
         password: { label: "Password", type: "password" },
       },
-      async authorize(credentials) {
+      async authorize(credentials): Promise<User | null> {
+        // Validate the input format
         const parsedCredentials = z
           .object({ email: z.string().email(), password: z.string().min(6) })
           .safeParse(credentials);
 
-        if (parsedCredentials.success) {
-          const { email, password } = parsedCredentials.data;
-          const user = await prisma.user.findUnique({
-            where: { email },
-            select: {
-              id: true,
-              email: true,
-              password: true,
-              role: {
-                select: {
-                  name: true,
-                  permissions: {
-                    select: {
-                      permission: {
-                        select: {
-                          action: true,
-                          subject: true,
-                        },
+        if (!parsedCredentials.success) {
+          // If validation fails, return a custom error message
+          throw new Error("Invalid email or password format.");
+        }
+
+        const { email, password } = parsedCredentials.data;
+
+        // Find user by email
+        const user = await prisma.user.findUnique({
+          where: { email },
+          select: {
+            id: true,
+            email: true,
+            password: true,
+            role: {
+              select: {
+                name: true,
+                permissions: {
+                  select: {
+                    permission: {
+                      select: {
+                        action: true,
+                        subject: true,
                       },
                     },
                   },
                 },
               },
             },
-          });
-          if (!user) return null;
+          },
+        });
 
-          const passwordsMatch = await bcrypt.compare(password, user.password);
-
-          if (passwordsMatch) {
-            const cleanedUser = {
-              id: user.id,
-              email: user.email,
-              role: {
-                name: user.role.name,
-                permissions: user.role.permissions.map(
-                  (permission) => permission.permission
-                ),
-              },
-            };
-
-            return cleanedUser;
-          }
+        // If no user found with the email
+        if (!user) {
+          throw new Error("Email or password doesn't match.");
         }
 
-        return null;
+        // Compare passwords
+        const passwordsMatch = await bcrypt.compare(password, user.password);
+        if (!passwordsMatch) {
+          throw new Error("Email or password doesn't match.");
+        }
+
+        // Return the user object if everything is fine
+        return {
+          id: user.id,
+          email: user.email,
+          role: {
+            name: user.role.name,
+            permissions: user.role.permissions.map(
+              (permission) => permission.permission
+            ),
+          },
+        };
       },
     }),
   ],
@@ -97,6 +119,8 @@ export const authOptions: NextAuthOptions = {
   secret: process.env.NEXTAUTH_SECRET,
 };
 
+// Create the NextAuth handler
 const handler = NextAuth(authOptions);
 
+// Export the handler for GET and POST requests
 export { handler as GET, handler as POST };

@@ -1,13 +1,15 @@
 "use server";
 
 import bcrypt from "bcrypt";
-import { PrismaClient } from "@prisma/client";
-
-const prisma = new PrismaClient();
+import { prisma } from "./prisma";
 
 export async function managerSignUpAction(formData: FormData) {
   try {
-    const role = await prisma.role.findFirst({ where: { name: "superAdmin" } });
+    let role = await prisma.role.findFirst({ where: { name: "superAdmin" } });
+
+    if (!role) {
+      role = await prisma.role.create({ data: { name: "superAdmin" } });
+    }
 
     if (!role) {
       return { success: false, message: "Role not found" };
@@ -38,10 +40,10 @@ export async function managerSignUpAction(formData: FormData) {
 
 export async function customerSignUpAction(formData: FormData) {
   try {
-    const role = await prisma.role.findFirst({ where: { name: "customer" } });
+    let role = await prisma.role.findFirst({ where: { name: "customer" } });
 
     if (!role) {
-      return { success: false, message: "Role not found" };
+      role = await prisma.role.create({ data: { name: "customer" } });
     }
 
     const hashedPassword = await bcrypt.hash(

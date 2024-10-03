@@ -1,5 +1,9 @@
 import { createMongoAbility } from "@casl/ability";
 
-type Rule = Parameters<typeof createMongoAbility>[0];
+// Define the Permission type
+type Permission = { action: string; subject: string };
 
-export const createAbility = (rules: Rule) => createMongoAbility(rules);
+// Create the CASL ability based on the user's permissions
+export const createAbility = (permissions: Permission[]) => {
+  return createMongoAbility(permissions);
+};

@@ -1,5 +1,9 @@
 import React from "react";
 import OrderTable from "@/app/dashboard/orders/order-table";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/auth";
+import { createAbility } from "@/abilities/abilities";
+import { redirect } from "next/navigation";
 
 const orders = [
   {
@@ -28,7 +32,20 @@ const orders = [
     status: "DELIVERED",
   },
 ];
-const Orders = () => {
+const Orders = async () => {
+  const session = await getServerSession(authOptions);
+
+  if (!session) {
+    redirect("/login");
+  }
+
+  const { role } = session.user;
+
+  const ability = createAbility(role.permissions);
+
+  if (!ability.can("read", "orders")) {
+    redirect("/403");
+  }
   return (
     <>
       <OrderTable data={orders} />

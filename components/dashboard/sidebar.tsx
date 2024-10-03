@@ -30,7 +30,7 @@ const Sidebar = ({ isOpen, setIsOpen }: SidebarProps) => {
 
   const handleLogout = async () => {
     signOut({
-      callbackUrl: "/login", // Redirects to this URL after logout (optional)
+      callbackUrl: "/login",
     });
   };
 

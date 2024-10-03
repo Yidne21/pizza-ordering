@@ -40,6 +40,7 @@ const ManagerSignUpForm = () => {
       formData.append("location", data.location);
       formData.append("phoneNumber", data.phoneNumber);
       formData.append("restaurantName", data.restaurantName);
+      formData.append("logo", data.logo);
 
       const response = await managerSignUpAction(formData);
 
@@ -57,7 +58,7 @@ const ManagerSignUpForm = () => {
   };
   return (
     <Box
-      sx={{ display: "flex", flexDirection: "column", gap: "20px", mt: "20px" }}
+      sx={{ display: "flex", flexDirection: "column", gap: "5px", mt: "5px" }}
       component="form"
       onSubmit={handleSubmit(handleManagerSignUp)}
     >

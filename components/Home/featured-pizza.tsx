@@ -9,18 +9,21 @@ import CustomeSlider from "../ui/slider";
 
 const featPizzas = [
   {
+    id: "1",
     desc: "In publishing and graphic design, Lorem ipsum is a placeholder text commonly used to demonstrate the visual form of a document or a typeface without.",
     imagePath: featPizza,
     background: "#2F2F2F",
     discount: 50,
   },
   {
+    id: "2",
     desc: "In publishing and graphic design, Lorem ipsum is a placeholder text commonly used to demonstrate the visual form of a document or a typeface without.",
     imagePath: featPizza2,
     background: "#50482B",
     discount: 40,
   },
   {
+    id: "3",
     desc: "In publishing and graphic design, Lorem ipsum is a placeholder text commonly used to demonstrate the visual form of a document or a typeface without.",
     imagePath: featPizza3,
     background: "#296D60",

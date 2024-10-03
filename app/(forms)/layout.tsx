@@ -3,7 +3,7 @@ import Image from "next/image";
 
 function Layout({ children }: { children: React.ReactNode }) {
   return (
-    <Box sx={{ height: "100vh", color: "white" }}>
+    <Box sx={{ color: "white" }}>
       <Box sx={{ display: "flex" }}>
         {/* Left */}
         <Box
@@ -13,7 +13,6 @@ function Layout({ children }: { children: React.ReactNode }) {
             justifyContent: "center",
             alignItems: "center",
             flex: 1,
-            height: "100vh",
             p: { xs: 2, sm: 4, md: 6, lg: 10 },
           }}
         >
@@ -21,7 +20,7 @@ function Layout({ children }: { children: React.ReactNode }) {
             src="/images/emojione-pizza.svg"
             alt="pizza slice"
             width={305}
-            height={300}
+            height={305}
           />
         </Box>
         {/* Right */}
@@ -30,7 +29,7 @@ function Layout({ children }: { children: React.ReactNode }) {
             color: "black",
             display: "flex",
             flex: 1,
-            height: "100vh",
+            height: "100%",
             alignItems: "center",
             width: "100%",
             backgroundColor: "var(--textWhite)",

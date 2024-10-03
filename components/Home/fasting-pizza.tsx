@@ -8,6 +8,7 @@ import { Box, styled } from "@mui/material";
 
 const fastingPizzas = [
   {
+    id: "1",
     name: "Margherita",
     description: "Tomato, Mozzarella, Bell Peppers, Onions, Olives",
     price: 150,
@@ -16,47 +17,46 @@ const fastingPizzas = [
     restaurantAvatar: "/images/ava.svg",
   },
   {
-    name: "Margherita",
-    description: "Tomato, Mozzarella, Bell Peppers, Onions, Olives",
-    price: 150,
+    id: "188",
+    name: "Pepperoni",
+    description: "Tomato, Mozzarella, Pepperoni",
+    price: 180,
     image: "/pizza.jpg",
-    restaurant: "Azmera Pizza",
-    restaurantAvatar: "/images/ava.svg",
+    restaurant: "Pepperoni Palace",
+    restaurantAvatar: "/images/pepperoni.svg",
   },
   {
-    name: "Margherita",
-    description: "Tomato, Mozzarella, Bell Peppers, Onions, Olives",
-    price: 150,
+    id: "2",
+
+    name: "BBQ Chicken",
+    description: "BBQ sauce, Chicken, Mozzarella",
+    price: 200,
     image: "/pizza.jpg",
-    restaurant: "Azmera Pizza",
-    restaurantAvatar: "/images/ava.svg",
+    restaurant: "BBQ Grill",
+    restaurantAvatar: "/images/bbq.svg",
+  },
+
+  {
+    id: "3",
+
+    name: "Pepperoni",
+    description: "Tomato, Mozzarella, Pepperoni",
+    price: 180,
+    image: "/pizza.jpg",
+    restaurant: "Pepperoni Palace",
+    restaurantAvatar: "/images/pepperoni.svg",
   },
   {
-    name: "Margherita",
-    description: "Tomato, Mozzarella, Bell Peppers, Onions, Olives",
-    price: 150,
+    id: "4",
+
+    name: "BBQ Chicken",
+    description: "BBQ sauce, Chicken, Mozzarella",
+    price: 200,
     image: "/pizza.jpg",
-    restaurant: "Azmera Pizza",
-    restaurantAvatar: "/images/ava.svg",
-  },
-  {
-    name: "Margherita",
-    description: "Tomato, Mozzarella, Bell Peppers, Onions, Olives",
-    price: 150,
-    image: "/pizza.jpg",
-    restaurant: "Azmera Pizza",
-    restaurantAvatar: "/images/ava.svg",
-  },
-  {
-    name: "Margherita",
-    description: "Tomato, Mozzarella, Bell Peppers, Onions, Olives",
-    price: 150,
-    image: "/pizza.jpg",
-    restaurant: "Azmera Pizza",
-    restaurantAvatar: "/images/ava.svg",
+    restaurant: "BBQ Grill",
+    restaurantAvatar: "/images/bbq.svg",
   },
 ];
-
 function FastingPizza() {
   const CustomSliderWrapper = styled(Box)({
     "& .slick-slide": {

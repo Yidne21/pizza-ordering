@@ -9,13 +9,11 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import InputField from "@/components/ui/input-field";
 import { useRouter } from "next/navigation";
-import { useSession } from "next-auth/react";
 import { signIn } from "next-auth/react";
 
 const label = { inputProps: { "aria-label": "Checkbox demo" } };
 const LoginForm = () => {
   const navigation = useRouter();
-  const { data: session } = useSession();
 
   const [isSubmitting, setIsSubmitting] = useState(false); // Track submission state
   const [loginError, setLoginError] = useState<string | null | undefined>(null); // Track upload errors
@@ -33,28 +31,28 @@ const LoginForm = () => {
     setIsSubmitting(true);
     setLoginError(null);
 
-    const formData = new FormData();
-    formData.append("email", data.email);
-    formData.append("password", data.password);
-
     const response = await signIn("credentials", {
-      redirect: false,
+      redirect: false, // Prevent redirect here to manually handle it
       email: data.email,
       password: data.password,
     });
-
-    console.log(response);
 
     if (response?.error) {
       setLoginError(response.error);
       setIsSubmitting(false);
     } else {
       reset();
-      if (session) {
-        if (session.user.role.name === "superAdmin") {
-          navigation.push("/admin/dashboard");
-        } else {
+      // Wait for session update before redirecting
+      const updatedSession = await fetch("/api/auth/session").then((res) =>
+        res.json()
+      );
+
+      if (updatedSession?.user?.role?.name) {
+        // Redirect based on role
+        if (updatedSession.user.role.name === "customer") {
           navigation.push("/");
+        } else {
+          navigation.push("/dashboard");
         }
       }
     }
