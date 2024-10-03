@@ -1,27 +1,9 @@
 "use server";
 
-import { signIn } from "@/auth";
-import { AuthError } from "next-auth";
 import bcrypt from "bcrypt";
 import { PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient();
-
-export async function authenticate(formData: FormData) {
-  try {
-    await signIn("credentials", formData);
-  } catch (error) {
-    if (error instanceof AuthError) {
-      switch (error.type) {
-        case "CredentialsSignin":
-          return { success: false, message: "Invalid email or password" };
-        default:
-          return { success: false, message: "Something went wrong" };
-      }
-    }
-    throw error;
-  }
-}
 
 export async function managerSignUpAction(formData: FormData) {
   try {

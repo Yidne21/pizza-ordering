@@ -1,16 +1,18 @@
 import NextAuth from "next-auth";
-import { authConfig } from "./auth.config";
-import Credentials from "next-auth/providers/credentials";
-import { z } from "zod";
+import { prisma } from "@/lib/prisma";
 import bcrypt from "bcrypt";
-import { PrismaClient } from "@prisma/client";
+import { z } from "zod";
+import Credentials from "next-auth/providers/credentials";
+import { NextAuthOptions } from "next-auth";
 
-const prisma = new PrismaClient();
-
-export const { auth, signIn, signOut } = NextAuth({
-  ...authConfig,
+export const authOptions: NextAuthOptions = {
   providers: [
     Credentials({
+      name: "Credentials",
+      credentials: {
+        email: { label: "Email", type: "email" },
+        password: { label: "Password", type: "password" },
+      },
       async authorize(credentials) {
         const parsedCredentials = z
           .object({ email: z.string().email(), password: z.string().min(6) })
@@ -26,13 +28,11 @@ export const { auth, signIn, signOut } = NextAuth({
               password: true,
               role: {
                 select: {
-                  id: false,
                   name: true,
                   permissions: {
                     select: {
                       permission: {
                         select: {
-                          id: false,
                           action: true,
                           subject: true,
                         },
@@ -50,6 +50,7 @@ export const { auth, signIn, signOut } = NextAuth({
           if (passwordsMatch) {
             const cleanedUser = {
               id: user.id,
+              email: user.email,
               role: {
                 name: user.role.name,
                 permissions: user.role.permissions.map(
@@ -57,6 +58,7 @@ export const { auth, signIn, signOut } = NextAuth({
                 ),
               },
             };
+
             return cleanedUser;
           }
         }
@@ -65,4 +67,36 @@ export const { auth, signIn, signOut } = NextAuth({
       },
     }),
   ],
-});
+  pages: { signIn: "/login" },
+  session: { strategy: "jwt", updateAge: 0 },
+  callbacks: {
+    async jwt({ token, user }) {
+      if (user) {
+        token.id = user.id;
+        token.email = user.email;
+        token.role = user.role;
+      }
+      return token;
+    },
+    async session({ session, token }) {
+      if (!token.id) return session;
+
+      session.user = {
+        ...session.user,
+        id: token.id.toString(), // Convert the id to a string
+        email: token.email ?? "", // Use nullish coalescing operator to provide a default value
+        role: token.role as {
+          name: string;
+          permissions: { action: string; subject: string }[];
+        },
+      };
+
+      return session;
+    },
+  },
+  secret: process.env.NEXTAUTH_SECRET,
+};
+
+const handler = NextAuth(authOptions);
+
+export { handler as GET, handler as POST };

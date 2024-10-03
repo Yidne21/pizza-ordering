@@ -2,19 +2,20 @@
 
 import { Box, Button, Checkbox, Divider, Typography } from "@mui/material";
 import Link from "next/link";
-import { useSearchParams } from "next/navigation";
 import { useState } from "react";
 import { LoginSchema } from "@/utils/schema";
 import { LoginFormTypes } from "@/utils/types";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import InputField from "@/components/ui/input-field";
-import { authenticate } from "@/lib/actions";
+import { useRouter } from "next/navigation";
+import { useSession } from "next-auth/react";
+import { signIn } from "next-auth/react";
 
 const label = { inputProps: { "aria-label": "Checkbox demo" } };
 const LoginForm = () => {
-  const router = useSearchParams();
-  const page = router.get("page");
+  const navigation = useRouter();
+  const { data: session } = useSession();
 
   const [isSubmitting, setIsSubmitting] = useState(false); // Track submission state
   const [loginError, setLoginError] = useState<string | null | undefined>(null); // Track upload errors
@@ -32,22 +33,30 @@ const LoginForm = () => {
     setIsSubmitting(true);
     setLoginError(null);
 
-    try {
-      const formData = new FormData();
-      formData.append("email", data.email);
-      formData.append("password", data.password);
+    const formData = new FormData();
+    formData.append("email", data.email);
+    formData.append("password", data.password);
 
-      const response = await authenticate(formData);
+    const response = await signIn("credentials", {
+      redirect: false,
+      email: data.email,
+      password: data.password,
+    });
 
-      if (response?.success) {
-        reset();
-        setIsSubmitting(false);
-      } else {
-        setLoginError(response?.message);
-        setIsSubmitting(false);
+    console.log(response);
+
+    if (response?.error) {
+      setLoginError(response.error);
+      setIsSubmitting(false);
+    } else {
+      reset();
+      if (session) {
+        if (session.user.role.name === "superAdmin") {
+          navigation.push("/admin/dashboard");
+        } else {
+          navigation.push("/");
+        }
       }
-    } catch (error) {
-      console.log(error);
     }
   };
 
@@ -120,8 +129,11 @@ const LoginForm = () => {
 
         <Box sx={{ display: "flex", justifyContent: "center" }}>
           <Typography>Have not have an account?</Typography>
-          <Link href={"/" + page} style={{ color: "#FF8100" }}>
-            Sign up
+          <Link href={"/manager-sign-up"} style={{ color: "#FF8100" }}>
+            Sign up as Resturant Owner
+          </Link>
+          <Link href={"/customer-sign-up"} style={{ color: "#FF8100" }}>
+            Sign Up as Customer
           </Link>
         </Box>
       </Box>

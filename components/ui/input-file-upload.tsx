@@ -3,7 +3,12 @@ import { styled } from "@mui/material/styles";
 import Button from "@mui/material/Button";
 import FileUploadOutlinedIcon from "@mui/icons-material/FileUploadOutlined";
 import { Box, Typography } from "@mui/material";
-import { FieldError } from "react-hook-form";
+import {
+  FieldError,
+  UseFormRegister,
+  FieldValues,
+  Path,
+} from "react-hook-form";
 
 const VisuallyHiddenInput = styled("input")({
   clip: "rect(0 0 0 0)",
@@ -17,24 +22,26 @@ const VisuallyHiddenInput = styled("input")({
   width: 1,
 });
 
-interface InputFileUploadProps {
+interface InputFileUploadProps<T extends FieldValues> {
   label: string;
-  register: any;
-  name: string;
+  type: string;
+  register: UseFormRegister<T>;
+  name: keyof T; // Ensures `name` is one of the keys from the form's type
   error?: FieldError | string;
 }
 
-export default function InputFileUpload({
+export default function InputFileUpload<T extends FieldValues>({
   label,
   register,
+  type,
   name,
   error,
-}: InputFileUploadProps) {
+}: InputFileUploadProps<T>) {
   return (
     <Box
       sx={{
         display: "flex",
-        alignItems: "columun",
+        flexDirection: "column", // Fixed flex direction to column for alignment
         gap: "10px",
         padding: "5px",
         borderRadius: "3px",
@@ -56,7 +63,11 @@ export default function InputFileUpload({
         }}
       >
         {label}
-        <VisuallyHiddenInput type="file" {...register(name)} multiple />
+        <VisuallyHiddenInput
+          type={type}
+          {...register(name as Path<T>, { valueAsNumber: type === "number" })}
+          multiple
+        />
       </Button>
       {error && (
         <Typography sx={{ color: "red" }}>{error.toString()}</Typography>

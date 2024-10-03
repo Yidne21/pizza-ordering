@@ -42,6 +42,20 @@ export const managerSignUpSchema = z
     phoneNumber: z.string().min(6, {
       message: "please enter phone Number",
     }),
+    logo: z
+      .any()
+      .optional()
+      .refine(
+        (value) =>
+          typeof value === "string" ||
+          (value instanceof FileList && value.length > 0),
+        {
+          message: "logo is required",
+        }
+      ),
+    restaurantName: z.string().min(2, {
+      message: "please enter restaurant name",
+    }),
     password: z.string().min(6, {
       message: "Password must be at least 6 characters long",
     }),
@@ -49,6 +63,7 @@ export const managerSignUpSchema = z
       message: "Password must be at least 6 characters long",
     }),
   })
+
   .refine((data) => data.password === data.confirmPassword, {
     message: "Password don't match",
     path: ["confirmPassword"],

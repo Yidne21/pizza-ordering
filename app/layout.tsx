@@ -1,3 +1,5 @@
+"use client";
+
 import "@/components/ui/global.css";
 import { inter } from "@/components/ui/fonts";
 import { SessionProvider } from "next-auth/react";

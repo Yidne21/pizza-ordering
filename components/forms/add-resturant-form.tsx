@@ -1,7 +1,6 @@
 "use client";
 
 import { Button, Divider, TextField, Typography } from "@mui/material";
-import InputFileUpload from "../ui/input-file-upload";
 
 const AddResturantForm = () => {
   return (
@@ -51,8 +50,6 @@ const AddResturantForm = () => {
           type="text"
           variant="outlined"
         />
-
-        <InputFileUpload label="Upload Logo" />
 
         <Button
           type="submit"

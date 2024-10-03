@@ -1,54 +1,44 @@
-// eslint-disable-no-explicit-any
+import { TextField, Typography, TextFieldProps } from "@mui/material";
+import {
+  FieldError,
+  UseFormRegister,
+  FieldValues,
+  Path,
+} from "react-hook-form";
 
-import { Box, TextField, Typography } from "@mui/material";
-import { FieldError } from "react-hook-form";
-import { SxProps, Theme } from "@mui/system";
-
-type InputFieldProps = {
+type InputFieldProps<T extends FieldValues> = {
   label: string;
   type: string;
-  name: string;
-  register: any;
+  name: keyof T; // This ensures `name` is a key from the form's type
+  register: UseFormRegister<T>;
   error?: FieldError;
-  InputLabelProps?: any;
-  sx?: SxProps<Theme>;
+  InputLabelProps?: TextFieldProps["InputLabelProps"];
   value?: string;
 };
 
-const InputField = ({
+const InputField = <T extends FieldValues>({
   label,
   type,
   name,
   register,
   error,
   InputLabelProps,
-  sx,
   value,
-}: InputFieldProps) => {
+}: InputFieldProps<T>) => {
   return (
-    <Box
-      sx={{
-        width: "100%",
-        display: "flex",
-        gap: 1,
-        flexDirection: "column",
-        ...sx,
-      }}
-    >
+    <>
       <TextField
-        {...register(name, { valueAsNumber: type === "number" })}
+        {...register(name as Path<T>, { valueAsNumber: type === "number" })}
         label={label}
         type={type}
         variant="outlined"
-        slotProps={InputLabelProps}
+        InputLabelProps={InputLabelProps}
         value={value}
       />
       {error?.message && (
-        <Typography sx={{ color: "red" }}>
-          {error.message.toString()}
-        </Typography>
+        <Typography sx={{ color: "red" }}>{error.message}</Typography>
       )}
-    </Box>
+    </>
   );
 };
 

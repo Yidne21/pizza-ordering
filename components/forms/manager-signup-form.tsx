@@ -9,11 +9,14 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import InputField from "@/components/ui/input-field";
 import { managerSignUpAction } from "@/lib/actions";
 import { useState } from "react";
+import { useRouter } from "next/navigation";
+import InputFileUpload from "../ui/input-file-upload";
 
 const label = { inputProps: { "aria-label": "Checkbox demo" } };
 const ManagerSignUpForm = () => {
-  const [isSubmitting, setIsSubmitting] = useState(false); // Track submission state
-  const [signUpError, setSignUpError] = useState<string | null>(null); // Track upload errors
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [signUpError, setSignUpError] = useState<string | null>(null);
+  const router = useRouter();
 
   const {
     register,
@@ -36,13 +39,17 @@ const ManagerSignUpForm = () => {
       formData.append("password", data.password);
       formData.append("location", data.location);
       formData.append("phoneNumber", data.phoneNumber);
+      formData.append("restaurantName", data.restaurantName);
 
       const response = await managerSignUpAction(formData);
 
       if (response.success) {
+        setIsSubmitting(false);
         reset();
+        router.push("/login");
       } else {
         setSignUpError(response.message);
+        setIsSubmitting(false);
       }
     } catch (error) {
       console.log(error);
@@ -94,10 +101,27 @@ const ManagerSignUpForm = () => {
 
       <InputField
         register={register}
+        error={errors.location}
+        name="restaurantName"
+        label="Restaurant Name"
+        type="text"
+      />
+
+      <InputField
+        register={register}
         error={errors.phoneNumber}
         name="phoneNumber"
         label="Phone Number"
         type="text"
+      />
+
+      {/* File Upload */}
+      <InputFileUpload
+        label="Upload Pizza Photo"
+        name="logo"
+        register={register}
+        error={errors.logo?.message?.toString()}
+        type="file"
       />
 
       <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>

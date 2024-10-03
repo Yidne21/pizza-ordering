@@ -1,3 +1,5 @@
+"use client";
+
 import {
   Box,
   Button,
@@ -16,6 +18,7 @@ import { sideBarMenu } from "@/utils/constant";
 import React from "react";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
+import { signOut } from "next-auth/react";
 
 interface SidebarProps {
   isOpen: boolean;
@@ -24,8 +27,12 @@ interface SidebarProps {
 
 const Sidebar = ({ isOpen, setIsOpen }: SidebarProps) => {
   const pathname = usePathname();
-  console.log(pathname);
-  const handleLogout = async () => {};
+
+  const handleLogout = async () => {
+    signOut({
+      callbackUrl: "/login", // Redirects to this URL after logout (optional)
+    });
+  };
 
   return (
     <Box

@@ -225,6 +225,7 @@ function AddMenuForm() {
         name="logo"
         register={register}
         error={errors.logo?.message?.toString()}
+        type="file"
       />
 
       {/* Submit Button */}
