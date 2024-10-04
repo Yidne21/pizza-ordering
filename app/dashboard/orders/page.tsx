@@ -20,9 +20,16 @@ const Orders = async () => {
   if (!ability.can(Actions.read, Subjects.orders)) {
     redirect("/403");
   }
+
+  const resturantId = session.user.resturantId;
+
+  if(!resturantId){
+    redirect("/403");
+  }
+
   return (
     <>
-      <OrderTable />
+      <OrderTable resturantId={resturantId}/>
     </>
   );
 };

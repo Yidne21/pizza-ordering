@@ -20,9 +20,15 @@ async function Roles() {
     redirect("/403");
   }
 
+  const resturantId = session.user.resturantId;
+
+  if(!resturantId){
+    redirect("/403");
+  }
+
   return (
     <>
-      <RoleTable/>
+      <RoleTable resturantId={resturantId}/>
     </>
   );
 }

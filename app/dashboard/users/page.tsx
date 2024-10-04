@@ -20,9 +20,15 @@ async function Users() {
     redirect("/403");
   }
 
+  const resturantId = session.user.resturantId;
+
+  if(!resturantId){
+    redirect("/403");
+  }
+
   return (
     <>
-      <UserTable />
+      <UserTable resturantId={resturantId}/>
     </>
   );
 }

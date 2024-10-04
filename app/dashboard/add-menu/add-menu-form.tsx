@@ -17,15 +17,33 @@ import { addMenuFormTypes } from "@/utils/types";
 import { addMenuSchema } from "@/utils/schema";
 import InputField from "@/components/ui/input-field";
 import AddOutlinedIcon from "@mui/icons-material/AddOutlined";
-import { addMenu } from "@/lib/adminActions"; // Import the server action
+import { addMenu } from "@/lib/adminActions";
+import { useSession } from "next-auth/react";
 
-const toppings = ["Cheese", "Pepperoni", "Sausage", "Onions", "Peppers"];
+const toppings = [
+  { name: "Cheese", id: "13333" },
+  { name: "Tomato", id: "13334" },
+  { name: "Mushroom", id: "13335" },
+  { name: "Onion", id: "13336" },
+  { name: "Capsicum", id: "13337" },
+  { name: "Olives", id: "13338" },
+];
 
 function AddMenuForm() {
   const [open, setOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false); // Track submission state
   const [uploadError, setUploadError] = useState<string | null>(null); // Track upload errors
   const handleClose = () => setOpen(!open);
+  const session = useSession();
+  
+  if(session){
+    console.log("###########");
+    
+    console.log(session);
+
+    console.log("###########");
+
+  }
 
   const {
     register,
@@ -46,7 +64,7 @@ function AddMenuForm() {
       const formData = new FormData();
       formData.append("name", data.name);
       formData.append("price", data.price.toString());
-      formData.append("logo", data.logo[0]); // Assuming the logo is an array of files
+      formData.append("image", data.logo[0]); // Assuming the logo is an array of files
       formData.append("toppings", JSON.stringify(data.toppings)); // Send toppings as JSON
 
       const response = await addMenu(formData); // Call the server action
@@ -166,8 +184,8 @@ function AddMenuForm() {
                       render={({ field }) => (
                         <Checkbox
                           {...field}
-                          value={topping}
-                          checked={field.value.includes(topping)}
+                          value={topping.id}
+                          checked={field.value.includes(topping.id)}
                           onChange={(e) => {
                             if (e.target.checked) {
                               field.onChange([...field.value, e.target.value]);
@@ -188,7 +206,7 @@ function AddMenuForm() {
                       )}
                     />
                   }
-                  label={topping}
+                  label={topping.name}
                 />
               ))}
               <Button

@@ -32,7 +32,17 @@ export async function managerSignUpAction(formData: FormData) {
       throw new Error("Failed to upload logo");
     }
 
-    const superAdmin = await prisma.user.create({
+    const resturant = await prisma.resturant.create({
+      data: {
+        name: formData.get("restaurantName") as string,
+        location: formData.get("location") as string,
+        phone: formData.get("phoneNumber") as string,
+        email: formData.get("email") as string,
+        logoUrl: logoUrl,
+      },
+    });
+
+    await prisma.user.create({
       data: {
         name: formData.get("name") as string,
         email: formData.get("email") as string,
@@ -40,17 +50,7 @@ export async function managerSignUpAction(formData: FormData) {
         phone: formData.get("phoneNumber") as string,
         location: formData.get("location") as string,
         role: { connect: { id: role.id } },
-      },
-    });
-
-    await prisma.resturant.create({
-      data: {
-        name: formData.get("restaurantName") as string,
-        location: formData.get("location") as string,
-        phone: formData.get("phoneNumber") as string,
-        email: formData.get("email") as string,
-        logoUrl: logoUrl,
-        superAdminId: superAdmin.id,
+        resturant: {connect: {id: resturant.id }}
       },
     });
 

@@ -9,6 +9,7 @@ import { NextAuthOptions } from "next-auth";
 interface User {
   id: string;
   email: string;
+  resturantId: string | null;
   role: {
     id: string;
     name: string;
@@ -47,6 +48,7 @@ export const authOptions: NextAuthOptions = {
             id: true,
             email: true,
             password: true,
+            resturantId: true,
             role: {
               select: {
                 id: true,
@@ -81,6 +83,7 @@ export const authOptions: NextAuthOptions = {
         return {
           id: user.id,
           email: user.email,
+          resturantId: user.resturantId,
           role: {
             id: user.role.id,
             name: user.role.name,
@@ -100,6 +103,7 @@ export const authOptions: NextAuthOptions = {
         token.id = user.id;
         token.email = user.email;
         token.role = user.role;
+        token.resturantId = user.resturantId;
       }
       return token;
     },
@@ -108,9 +112,11 @@ export const authOptions: NextAuthOptions = {
 
       session.user = {
         ...session.user,
-        id: token.id.toString(), // Convert the id to a string
-        email: token.email ?? "", // Use nullish coalescing operator to provide a default value
+        id: token.id.toString(), 
+        email: token.email ?? "",
+        resturantId: token.resturantId as string,
         role: token.role as {
+          id: string;
           name: string;
           permissions: { action: string; subject: string }[];
         },

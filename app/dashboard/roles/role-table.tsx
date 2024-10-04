@@ -7,8 +7,11 @@ import { Role } from "./role-table-column";
 import { filterRoles } from "@/lib/adminActions";
 import { MRT_ColumnFiltersState } from "material-react-table";
 
+type RoleTableProps = {
+  resturantId: string;
+}
 
-function RoleTable() {
+function RoleTable(props: RoleTableProps) {
   const [data, setData] = useState<Role[]>([]);
 
   // Memoize fetchData to prevent unnecessary re-renders
@@ -39,10 +42,10 @@ function RoleTable() {
 
       console.log(filters);
 
-      const result = await filterRoles(filters);
+      const result = await filterRoles(filters, props.resturantId);
       setData(result.roles);
     },
-    []
+    [props.resturantId]
   );
 
   return (

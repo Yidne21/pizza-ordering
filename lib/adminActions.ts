@@ -1,17 +1,14 @@
 "use server";
 
 import { prisma } from "@/lib/prisma";
-import { getServerSession } from "next-auth/next";
-import { createAbility } from "@/abilities/abilities";
-import { redirect } from "next/navigation";
 import { Prisma, OrderStatus, RoleStatus, } from "@prisma/client";
 import { Role } from "@/app/dashboard/roles/role-table-column";
 import { User } from "@/app/dashboard/users/user-table-column";
+import { imageUploader } from "./fileUpload";
 
 
 
 // orders
-
 export async function filterOrders({
   status,
   customerPhone,
@@ -22,49 +19,13 @@ export async function filterOrders({
   customerPhone?: string;
   pizzaName?: string;
   global?: string;
-}) {
-  const requiredAction = "filter";
-  const requiredSubject = "Order";
+}, resturantId: string) {
 
-  // Get session and user data
-  const session = await getServerSession();
-  if (!session?.user) {
-    return redirect("/login");
-  }
-
-  console.log(session);
-  const userPermissions = session.user.role.permissions;
-
-  // Create ability instance based on user's permissions
-  const ability = createAbility(userPermissions);
-
-  // Redirect if user doesn't have permission to filter orders
-  if (!ability.can(requiredAction, requiredSubject)) {
-    return redirect("/403");
-  }
-
-  let resturantRole;
-
-  try {
-    // Fetch the resturantId associated with the user's role
-    resturantRole = await prisma.resturantRole.findFirst({
-      where: { roleId: session.user.role.id },
-      select: { resturantId: true },
-    });
-
-    if (!resturantRole) {
-      throw new Error(
-        "User does not have a role associated with any restaurant."
-      );
-    }
-  } catch (error) {
-    console.error("Error fetching restaurant role:", error);
-    throw new Error("Could not fetch restaurant role. Please try again later.");
-  }
+  console.log(resturantId, "###########");
 
   const where: Prisma.OrderWhereInput = {
     pizza: {
-      resturantId: resturantRole.resturantId, // Filter orders by the restaurant ID
+      resturantId: resturantId, // Filter orders by the restaurant ID
     },
   };
 
@@ -141,27 +102,10 @@ export async function updateOrderStatus({
   orderId,
   status,
 }: {
-  orderId: number;
+  orderId: string;
   status: "READY" | "PREPARING" | "DELIVERED";
 }) {
-  const requiredAction = "update";
-  const requiredSubject = "OrderStatus";
 
-  // Get session and user data
-  const session = await getServerSession();
-  if (!session?.user) {
-    return redirect("/login");
-  }
-
-  const userPermissions = session.user.role.permissions;
-
-  // Create ability instance based on user's permissions
-  const ability = createAbility(userPermissions);
-
-  // Redirect if user doesn't have permission to filter orders
-  if (!ability.can(requiredAction, requiredSubject)) {
-    return redirect("/403");
-  }
 
   try {
     // Update the order status
@@ -182,17 +126,41 @@ export async function updateOrderStatus({
 // menu
 export async function addMenu(formData: FormData) {
   try {
-    // Example Cloudinary file upload logic or any other form data processing
-    // const response = await cloudinary.uploader.upload(...);
+    const name = formData.get("name") as string;
+    const price = parseFloat(formData.get("price") as string); 
+    // const toppings = formData.getAll("toppings") as string[];
+    const resturantId =formData.get("resturantId") as string;
+    
+    const imageFile = formData.get("image") as File;
 
-    console.log("Menu data:", formData);
+    // Upload the image and get the URL
+    const imageUrl = await imageUploader(imageFile, "pizza/images");
+    if (!imageUrl) {
+      throw new Error("Failed to upload pizza image");
+    }
 
-    // Simulate success response (you would replace this with actual API logic)
-    return { success: true, message: "Menu added successfully" };
+    
+    // Get topping IDs (assuming the toppings were already created in the database)
+    // const toppingIds = toppings.map(toppingId => ({ toppingId: parseInt(toppingId) }));
+
+    // Create the new pizza in the database
+    const newPizza = await prisma.pizza.create({
+      data: {
+        name,
+        price,
+        photoUrl: imageUrl, // Use the uploaded image URL
+        resturant: {
+          connect: { id: resturantId } // Link the pizza to the resturant
+        },
+      }
+    });
+
+    return { success: true, message: "Menu added successfully", pizza: newPizza };
   } catch (error) {
     console.error("Error adding menu:", error);
     return { success: false, message: "Something went wrong" };
-  }
+  } 
+
 }
 
 export async function filterRoles({
@@ -203,19 +171,12 @@ export async function filterRoles({
   name?: string;
   status?: RoleStatus; // Change to RoleStatus type
   global?: string;
-}) {
+}, restaurantId: string) {
   try {
-    const restaurantId = "1334jfsfsdj";
-
-    
 
     // Prepare the filters
     const whereFilters: Prisma.RoleWhereInput = {
-      ResturantRole: {
-        some: {
-          resturantId: restaurantId,
-        },
-      },
+      resturantId: restaurantId,
       ...(status ? { status } : {}), // Ensure status is of type RoleStatus
       ...(name ? { name: { contains: name, mode: 'insensitive' } } : {}), // Handle name filtering
     };
@@ -291,15 +252,11 @@ export async function filterUsers(
     phone?: string;
     global?: string;
   },
+  resturantId: string,
 ){
 try {
-  const resturantId = "jsdkfkdfkjkjkfsj343";
   const whereFilters: Prisma.UserWhereInput = {
-    ResturantUser: {
-      some: {
-        resturantId: resturantId,
-      },
-    },
+   resturantId:resturantId,
     ...(name ? { name: { contains: name, mode: 'insensitive' } } : {}),
     ...(email ? { email: { contains: email, mode: 'insensitive' } } : {}),
     ...(phone ? { phone: { contains: phone, mode: 'insensitive' } } : {}),
@@ -345,5 +302,28 @@ export async function addUser(formData: FormData) {
   } catch (error) {
     console.error("Error adding User:", error);
     return { success: false, message: "Something went wrong" };
+  }
+}
+
+export async function getToppingsByResturantId(resturantId: string) {
+  try {
+  
+    const toppings = await prisma.topping.findMany({
+      where: {
+        resturantId: resturantId
+      },
+      select: {
+        id: true,
+        name: true,
+      }
+    });
+
+    // Return the toppings
+    return { success: true, toppings };
+  } catch (error) {
+    console.error("Error fetching toppings:", error);
+    return { success: false, message: "Failed to fetch toppings" };
+  } finally {
+    await prisma.$disconnect();
   }
 }

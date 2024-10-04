@@ -7,8 +7,12 @@ import { filterUsers } from "@/lib/adminActions";
 import { MRT_ColumnFiltersState } from "material-react-table";
 import { useCallback, useState } from "react";
 
+type UserTableProps ={
+  resturantId: string;
+}
 
-function UserTable() {
+
+function UserTable(props: UserTableProps) {
   const [data, setData] = useState<User[]>([]);
 
     // Memoize fetchData to prevent unnecessary re-renders
@@ -37,10 +41,10 @@ function UserTable() {
           global: params.globalFilter,
         };
   
-        const result = await filterUsers(filters);
+        const result = await filterUsers(filters, props.resturantId);
         setData(result.users);
       },
-      []
+      [props.resturantId]
     );
     
   return (

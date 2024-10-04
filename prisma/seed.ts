@@ -5,10 +5,36 @@ import bcrypt from "bcrypt";
 const prisma = new PrismaClient();
 
 async function main() {
-  // default Roles
+
+
+  const resturant = await prisma.resturant.create({
+    data: {
+      name: "Pizza Place",
+      location: "123 Main St",
+      phone: "1234567890",
+      email: "pizza@gmail.com",
+      logoUrl: "https://placehold.co/400",
+    },
+  });
+
   const adminRole = await prisma.role.create({
     data: {
       name: "superAdmin",
+      resturantId: resturant.id,
+    },
+  });
+
+  const hashedAdminPassword = await bcrypt.hash("123456", 10);
+
+  await prisma.user.create({
+    data: {
+      email: "admin@example.com",
+      password: hashedAdminPassword,
+      name: "Admin User",
+      phone: "1234567890",
+      location: "Admin Location",
+      roleId: adminRole.id,
+      resturantId: resturant.id
     },
   });
 
@@ -83,31 +109,6 @@ async function main() {
     ],
   });
 
-  // User example
-
-  const hashedAdminPassword = await bcrypt.hash("123456", 10);
-
-  const adminUser = await prisma.user.create({
-    data: {
-      email: "admin@example.com",
-      password: hashedAdminPassword,
-      name: "Admin User",
-      phone: "1234567890",
-      location: "Admin Location",
-      roleId: adminRole.id,
-    },
-  });
-
-  const resturant = await prisma.resturant.create({
-    data: {
-      superAdminId: adminUser.id,
-      name: "Pizza Place",
-      location: "123 Main St",
-      phone: "1234567890",
-      email: "pizza@gmail.com",
-      logoUrl: "https://placehold.co/400",
-    },
-  });
 
   // Example Toppings for the above resturant
   const toppings = [
@@ -123,39 +124,35 @@ async function main() {
     { name: "Spinach" },
   ];
 
-  const createdToppings = await prisma.topping.createMany({
+await prisma.topping.createMany({
     data: toppings.map((topping) => ({
       resturantId: resturant.id,
       name: topping.name,
     })),
   });
 
-  console.log("Created Toppings:", createdToppings);
-
   // roles might be created by superAdmin
 
-  const kitchenManagerRole = await prisma.role.create({
-    data: {
-      name: "kitchenManager",
-    },
-  });
-
-  const deliveryManagerRole = await prisma.role.create({
-    data: {
-      name: "deliveryManager",
-    },
-  });
-
-  // associate roles with resturant
-
-  await prisma.resturantRole.createMany({
+  await prisma.role.createMany({
     data: [
       {
-        roleId: kitchenManagerRole.id,
+        name: "kitchenManager",
         resturantId: resturant.id,
       },
       {
-        roleId: deliveryManagerRole.id,
+        name: "deliveryManager",
+        resturantId: resturant.id,
+      },
+      {
+        name: "chef",
+        resturantId: resturant.id,
+      },
+      {
+        name: "manager",
+        resturantId: resturant.id,
+      },
+      {
+        name: "reception",
         resturantId: resturant.id,
       },
     ],
@@ -255,13 +252,11 @@ async function main() {
     },
   ];
 
-  const createdPermissions = await prisma.permission.createMany({
+ await prisma.permission.createMany({
     data: permissions.map((permission) => ({
       ...permission,
     })),
   });
-
-  console.log("Created Permissions:", createdPermissions);
 
   // Example Customer User
   const hashedUserPassword = await bcrypt.hash("123456", 10);
