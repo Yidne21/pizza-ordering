@@ -7,13 +7,15 @@ import { customerSignUpFormTypes } from "@/utils/types";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import InputField from "@/components/ui/input-field";
-import { customerSignUpAction } from "@/lib/actions";
+import { customerSignUpAction } from "@/lib/authActions";
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 
 const label = { inputProps: { "aria-label": "Checkbox demo" } };
 const CustomerSignUpForm = () => {
   const [isSubmitting, setIsSubmitting] = useState(false); // Track submission state
-  const [signUpError, setSignUpError] = useState<string | null>(null); // Track upload errors
+  const [signUpError, setSignUpError] = useState<string | null>(null);
+  const router = useRouter();
 
   const {
     register,
@@ -40,21 +42,39 @@ const CustomerSignUpForm = () => {
       const response = await customerSignUpAction(formData);
 
       if (response.success) {
+        setIsSubmitting(false);
         reset();
+        router.push("/login");
       } else {
         setSignUpError(response.message);
       }
     } catch (error) {
+      setSignUpError("Something went wrong");
+      setIsSubmitting(false);
       console.log(error);
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
   return (
     <Box
-      sx={{ display: "flex", flexDirection: "column", gap: "10px", mt: "10px" }}
+      sx={{
+        display: "flex",
+        flexDirection: "column",
+        gap: "10px",
+        mt: "10px",
+      }}
       component="form"
       onSubmit={handleSubmit(handleCustomerSignUp)}
     >
+      <InputField
+        register={register}
+        error={errors.email}
+        name="name"
+        label="Name"
+        type="text"
+      />
       <InputField
         register={register}
         error={errors.email}

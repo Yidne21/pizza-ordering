@@ -17,7 +17,7 @@ import { addMenuFormTypes } from "@/utils/types";
 import { addMenuSchema } from "@/utils/schema";
 import InputField from "@/components/ui/input-field";
 import AddOutlinedIcon from "@mui/icons-material/AddOutlined";
-import { addMenu } from "@/lib/actions"; // Import the server action
+import { addMenu } from "@/lib/adminActions"; // Import the server action
 
 const toppings = ["Cheese", "Pepperoni", "Sausage", "Onions", "Peppers"];
 

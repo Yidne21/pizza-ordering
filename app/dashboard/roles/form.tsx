@@ -11,7 +11,7 @@ import { addRoleFormTypes } from "@/utils/types";
 import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import InputField from "@/components/ui/input-field";
-import { addRole } from "@/lib/actions";
+import { addRole } from "@/lib/adminActions";
 
 type FormProps = {
   isEdit: boolean;

@@ -15,7 +15,7 @@ import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { addUserFormTypes } from "@/utils/types";
 import { addUserSchema } from "@/utils/schema";
-import { addUser } from "@/lib/actions";
+import { addUser } from "@/lib/adminActions";
 
 type FormProps = {
   roles: string[];

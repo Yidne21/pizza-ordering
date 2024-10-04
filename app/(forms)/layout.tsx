@@ -3,8 +3,8 @@ import Image from "next/image";
 
 function Layout({ children }: { children: React.ReactNode }) {
   return (
-    <Box sx={{ color: "white" }}>
-      <Box sx={{ display: "flex" }}>
+    <Box sx={{ color: "white", height: "100%" }}>
+      <Box sx={{ display: "flex", height: "100%" }}>
         {/* Left */}
         <Box
           sx={{

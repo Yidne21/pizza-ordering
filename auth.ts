@@ -10,6 +10,7 @@ interface User {
   id: string;
   email: string;
   role: {
+    id: string;
     name: string;
     permissions: {
       action: string;
@@ -48,6 +49,7 @@ export const authOptions: NextAuthOptions = {
             password: true,
             role: {
               select: {
+                id: true,
                 name: true,
                 permissions: {
                   select: {
@@ -80,6 +82,7 @@ export const authOptions: NextAuthOptions = {
           id: user.id,
           email: user.email,
           role: {
+            id: user.role.id,
             name: user.role.name,
             permissions: user.role.permissions.map(
               (permission) => permission.permission

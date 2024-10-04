@@ -139,6 +139,7 @@ model Order {
   pizza      Pizza       @relation(fields: [pizzaId], references: [id])
   pizzaId    String
   status     OrderStatus @default(PREPARING)
+  toppings   String[]
   quantity   Int
   total      Float
   createdAt  DateTime    @default(now())

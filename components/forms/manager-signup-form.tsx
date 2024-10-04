@@ -7,7 +7,7 @@ import { managerSignUpFormTypes } from "@/utils/types";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import InputField from "@/components/ui/input-field";
-import { managerSignUpAction } from "@/lib/actions";
+import { managerSignUpAction } from "@/lib/authActions";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import InputFileUpload from "../ui/input-file-upload";
@@ -40,7 +40,7 @@ const ManagerSignUpForm = () => {
       formData.append("location", data.location);
       formData.append("phoneNumber", data.phoneNumber);
       formData.append("restaurantName", data.restaurantName);
-      formData.append("logo", data.logo);
+      formData.append("logo", data.logo[0]);
 
       const response = await managerSignUpAction(formData);
 
@@ -118,7 +118,7 @@ const ManagerSignUpForm = () => {
 
       {/* File Upload */}
       <InputFileUpload
-        label="Upload Pizza Photo"
+        label="Upload Restaurant Logo"
         name="logo"
         register={register}
         error={errors.logo?.message?.toString()}

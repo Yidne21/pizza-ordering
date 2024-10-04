@@ -7,7 +7,7 @@ export enum UserRole {
 
 export const customerSignUp = z
   .object({
-    name: z.string().email({
+    name: z.string().min(2, {
       message: "please enter your name",
     }),
     email: z.string().email({

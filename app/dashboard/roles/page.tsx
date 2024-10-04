@@ -3,6 +3,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/auth";
 import { createAbility } from "@/abilities/abilities";
 import { redirect } from "next/navigation";
+import { Subjects, Actions } from "@/utils/contants";
 
 const data = [
   {
@@ -32,7 +33,7 @@ async function Roles() {
 
   const ability = createAbility(role.permissions);
 
-  if (!ability.can("read", "Role")) {
+  if (!ability.can(Actions.read, Subjects.roles)) {
     redirect("/403");
   }
 

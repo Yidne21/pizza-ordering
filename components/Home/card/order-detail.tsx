@@ -20,7 +20,7 @@ import { Controller, useForm } from "react-hook-form";
 import { orderSchema } from "@/utils/schema";
 import { orderFormTypes } from "@/utils/types";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { orderActions } from "@/lib/customerActions";
+import { createOrder } from "@/lib/customerActions";
 
 // Keyframes for rolling animation
 const rollToActive = keyframes`
@@ -37,11 +37,25 @@ const rollToActive = keyframes`
 const orderDetails = {
   name: "Margherita",
   price: 150,
-  toppings: ["Cheese", "Tomato", "Mushroom", "Onion", "Capsicum"],
+  toppings: [
+    { name: "Cheese", id: "13333" },
+    { name: "Tomato", id: "13334" },
+    { name: "Mushroom", id: "13335" },
+    { name: "Onion", id: "13336" },
+    { name: "Capsicum", id: "13337" },
+    { name: "Olives", id: "13338" },
+  ],
   images: ["/images/featPizza2.png", "/images/featPizza3.png"],
 };
 
-const toppings = ["Cheese", "Tomato", "Mushroom", "Onion", "Capsicum"];
+const toppings = [
+  { name: "Cheese", id: "13333" },
+  { name: "Tomato", id: "13334" },
+  { name: "Mushroom", id: "13335" },
+  { name: "Onion", id: "13336" },
+  { name: "Capsicum", id: "13337" },
+  { name: "Olives", id: "13338" },
+];
 
 interface OrderDetail {
   pizzaId: string;
@@ -82,14 +96,17 @@ function OrderDetailCard({ pizzaId }: OrderDetail) {
       formData.append("pizzaId", pizzaId);
       formData.append("total", totalPrice.toString());
       formData.append("quantity", Quantity.toString());
+      console.log(formData.get("toppings"));
 
-      const response = await orderActions(formData); // Call the server action
+      const response = await createOrder(formData); // Call the server action
 
       if (response.success) {
         setOpen(true); // Open success popup
         reset(); // Reset form after successful submission
       } else {
-        setOrderError(response.message); // Show error if upload fails
+        console.log(response.message);
+        setOrderError(response.message);
+        reset();
       }
     } catch (error) {
       console.log(error);
@@ -264,8 +281,8 @@ function OrderDetailCard({ pizzaId }: OrderDetail) {
                     render={({ field }) => (
                       <Checkbox
                         {...field}
-                        value={topping}
-                        checked={field.value.includes(topping)}
+                        value={topping.id}
+                        checked={field.value.includes(topping.id)}
                         onChange={(e) => {
                           if (e.target.checked) {
                             field.onChange([...field.value, e.target.value]);
@@ -286,7 +303,7 @@ function OrderDetailCard({ pizzaId }: OrderDetail) {
                     )}
                   />
                 }
-                label={topping}
+                label={topping.name}
               />
             ))}
           </Box>

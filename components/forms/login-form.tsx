@@ -59,7 +59,16 @@ const LoginForm = () => {
   };
 
   return (
-    <>
+    <Box
+      sx={{
+        display: "flex",
+        flexDirection: "column",
+        gap: "20px",
+        mt: "20px",
+      }}
+      component="form"
+      onSubmit={handleSubmit(handleLogin)}
+    >
       <Typography
         sx={{
           mt: 2,
@@ -77,65 +86,57 @@ const LoginForm = () => {
       </Typography>
       <Divider variant="fullWidth" sx={{ width: "100%" }} />
 
-      <Box
-        sx={{
-          display: "flex",
-          flexDirection: "column",
-          gap: "20px",
-          mt: "20px",
-        }}
-        component="form"
-        onSubmit={handleSubmit(handleLogin)}
-      >
-        <InputField
-          register={register}
-          error={errors.email}
-          name="email"
-          label="Email address"
-          type="email"
-        />
-        <InputField
-          register={register}
-          error={errors.password}
-          name="password"
-          label="Password"
-          type="password"
-        />
+      <InputField
+        register={register}
+        error={errors.email}
+        name="email"
+        label="Email address"
+        type="email"
+      />
+      <InputField
+        register={register}
+        error={errors.password}
+        name="password"
+        label="Password"
+        type="password"
+      />
 
-        <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-          <Checkbox {...label} />
-          <Typography>Remember me</Typography>
-        </Box>
-
-        <Button
-          type="submit"
-          variant="contained"
-          sx={{
-            width: "100%",
-            background: "#FF8100",
-          }}
-          disabled={isSubmitting}
-        >
-          LOGIN
-        </Button>
-
-        {loginError && (
-          <Typography sx={{ color: "red", textAlign: "center" }}>
-            {loginError}
-          </Typography>
-        )}
-
-        <Box sx={{ display: "flex", justifyContent: "center" }}>
-          <Typography>Have not have an account?</Typography>
-          <Link href={"/manager-sign-up"} style={{ color: "#FF8100" }}>
-            Sign up as Resturant Owner
-          </Link>
-          <Link href={"/customer-sign-up"} style={{ color: "#FF8100" }}>
-            Sign Up as Customer
-          </Link>
-        </Box>
+      <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+        <Checkbox {...label} />
+        <Typography>Remember me</Typography>
       </Box>
-    </>
+
+      <Button
+        type="submit"
+        variant="contained"
+        sx={{
+          width: "100%",
+          background: "#FF8100",
+        }}
+        disabled={isSubmitting}
+      >
+        LOGIN
+      </Button>
+
+      {loginError && (
+        <Typography sx={{ color: "red", textAlign: "center" }}>
+          {loginError}
+        </Typography>
+      )}
+
+      <Box sx={{ display: "flex", justifyContent: "center" }}>
+        <Typography>Have not have an account?</Typography>
+        <Link
+          href={"/manager-sign-up"}
+          style={{ color: "#FF8100", font: "8px" }}
+        >
+          Sign up as Resturant Owner
+        </Link>
+        <Link href={"/customer-sign-up"} style={{ color: "#FF8100" }}>
+          Sign Up as Customer
+        </Link>
+      </Box>
+    </Box>
   );
 };
 

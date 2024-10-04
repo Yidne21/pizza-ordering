@@ -5,6 +5,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/auth";
 import { createAbility } from "@/abilities/abilities";
 import { redirect } from "next/navigation";
+import { Subjects, Actions } from "@/utils/contants";
 
 async function AddMenu() {
   const session = await getServerSession(authOptions);
@@ -17,7 +18,7 @@ async function AddMenu() {
 
   const ability = createAbility(role.permissions);
 
-  if (!ability.can("create", "Menu")) {
+  if (!ability.can(Actions.create, Subjects.menu)) {
     redirect("/403");
   }
 

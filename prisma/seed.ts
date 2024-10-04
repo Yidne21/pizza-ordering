@@ -22,15 +22,15 @@ async function main() {
 
   const viewPizzaPermission = await prisma.permission.create({
     data: {
-      action: "view",
-      subject: "PizzaList",
+      action: "read",
+      subject: "menu",
     },
   });
 
   const viewOrderHistory = await prisma.permission.create({
     data: {
-      action: "view",
-      subject: "ownOrderHistory",
+      action: "read",
+      subject: "orderHistory",
     },
   });
 
@@ -38,6 +38,13 @@ async function main() {
     data: {
       action: "create",
       subject: "order",
+    },
+  });
+
+  const viewPizzasPermission = await prisma.permission.create({
+    data: {
+      action: "read",
+      subject: "menus",
     },
   });
 
@@ -68,6 +75,10 @@ async function main() {
       {
         roleId: userRole.id,
         permissionId: createOrder.id,
+      },
+      {
+        roleId: userRole.id,
+        permissionId: viewPizzasPermission.id,
       },
     ],
   });
@@ -154,31 +165,92 @@ async function main() {
 
   const permissions = [
     {
-      action: "add",
+      action: "read",
       subject: "roles",
     },
     {
-      action: "update",
-      subject: "roles",
-    },
-    {
-      action: "add",
-      subject: "users",
-    },
-    {
-      action: "view",
-      subject: "users",
-    },
-    {
-      action: "view",
-      subject: "Orders",
+      action: "create",
+      subject: "role",
     },
     {
       action: "update",
-      subject: "OrderStatus",
+      subject: "role",
     },
     {
-      action: "add",
+      action: "delete",
+      subject: "role",
+    },
+
+    {
+      action: "read",
+      subject: "users",
+    },
+    {
+      action: "create",
+      subject: "user",
+    },
+    {
+      action: "update",
+      subject: "user",
+    },
+    {
+      action: "delete",
+      subject: "user",
+    },
+
+    {
+      action: "read",
+      subject: "toppings",
+    },
+    {
+      action: "create",
+      subject: "topping",
+    },
+    {
+      action: "update",
+      subject: "topping",
+    },
+    {
+      action: "delete",
+      subject: "topping",
+    },
+
+    {
+      action: "read",
+      subject: "orders",
+    },
+    {
+      action: "update",
+      subject: "order",
+    },
+    {
+      action: "delete",
+      subject: "order",
+    },
+
+    {
+      action: "read",
+      subject: "orderHistory",
+    },
+    {
+      action: "update",
+      subject: "orderStatus",
+    },
+
+    {
+      action: "read",
+      subject: "menus",
+    },
+    {
+      action: "create",
+      subject: "menu",
+    },
+    {
+      action: "update",
+      subject: "menu",
+    },
+    {
+      action: "delete",
       subject: "menu",
     },
   ];

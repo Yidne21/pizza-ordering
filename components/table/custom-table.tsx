@@ -1,8 +1,7 @@
 "use client";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   MaterialReactTable,
-  MRT_ColumnFilterFnsState,
   MRT_RowData,
   useMaterialReactTable,
   type MRT_ColumnDef,
@@ -17,12 +16,17 @@ type CustomeTableProps<T extends MRT_RowData> = {
   columns: MRT_ColumnDef<T>[]; // Table columns configuration
   maxHeight: string; // Maximum height for the table scroll
   title: string; // Optional title for the table
+  fetchData: (params: {
+    filters: MRT_ColumnFiltersState;
+    globalFilter: string;
+  }) => Promise<void>; // Function to fetch server-side data
 };
 
 const CustomeTable = <T extends MRT_RowData>({
   data,
   columns,
   maxHeight,
+  fetchData,
   title,
 }: CustomeTableProps<T>) => {
   // State for column filters and global filter
@@ -30,13 +34,50 @@ const CustomeTable = <T extends MRT_RowData>({
     []
   );
   const [globalFilter, setGlobalFilter] = useState<string>("");
-  const [columnFilterFns, setColumnFilterFns] =
-    useState<MRT_ColumnFilterFnsState>(
-      () =>
-        Object.fromEntries(
-          columns.map(({ accessorKey, filterFn }) => [accessorKey, filterFn])
-        ) as MRT_ColumnFilterFnsState
-    );
+
+  // New states to track loading and error
+  const [isLoading, setIsLoading] = useState(false);
+  const [isRefetching, setIsRefetching] = useState(false);
+
+  // Fetch data when filters change
+  useEffect(() => {
+    const loadData = async () => {
+      setIsLoading(true);
+      try {
+        await fetchData({
+          filters: columnFilters,
+          globalFilter,
+        });
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    loadData();
+  }, [columnFilters, globalFilter]);
+
+  // Trigger refetching for filtering
+  useEffect(() => {
+    const refetchData = async () => {
+      setIsRefetching(true);
+      try {
+        await fetchData({
+          filters: columnFilters,
+          globalFilter,
+        });
+      } catch (error) {
+        console.error("Error refetching data:", error);
+      } finally {
+        setIsRefetching(false);
+      }
+    };
+
+    if (!isLoading) {
+      refetchData();
+    }
+  }, [columnFilters, globalFilter]);
 
   const [open, setOpen] = useState(false);
   const handleModalClose = () => {
@@ -49,16 +90,11 @@ const CustomeTable = <T extends MRT_RowData>({
 
   // Setting up Material React Table using custom hooks
   const table = useMaterialReactTable({
-    enableColumnActions: false,
-    enableSorting: false,
-    enablePagination: false,
-    enableTableFooter: false,
-    enableStickyFooter: false,
-    enableBottomToolbar: false,
     enableColumnFilterModes: true,
     manualFiltering: true,
     enableGlobalFilter: true,
     enableColumnFilters: true,
+    enablePagination: false,
     renderTopToolbarCustomActions: () => {
       return (
         <Box>
@@ -139,7 +175,8 @@ const CustomeTable = <T extends MRT_RowData>({
     state: {
       columnFilters,
       globalFilter,
-      columnFilterFns,
+      showProgressBars: isRefetching,
+      showSkeletons: isLoading,
     },
     muiTableContainerProps: {
       sx: {
@@ -185,7 +222,6 @@ const CustomeTable = <T extends MRT_RowData>({
 
     onColumnFiltersChange: setColumnFilters,
     onGlobalFilterChange: setGlobalFilter,
-    onColumnFilterFnsChange: setColumnFilterFns,
   });
 
   return <MaterialReactTable table={table} />;
