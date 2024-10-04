@@ -48,3 +48,62 @@ export async function createOrder(formData: FormData) {
     return { success: false, message: "Could not place order" };
   }
 }
+
+export async function fetchOrderByCustomerId() {
+  const requiredAction = "view";
+  const requiredSubject = "ownOrderHistory";
+
+  // Get session and user data
+  const session = await getServerSession();
+  if (!session?.user) {
+    return redirect("/login");
+  }
+
+  const userPermissions = session.user.role.permissions;
+
+  // Create ability instance based on user's permissions
+  const ability = createAbility(userPermissions);
+
+  // Redirect if user doesn't have permission to filter orders
+  if (!ability.can(requiredAction, requiredSubject)) {
+    return redirect("/403");
+  }
+
+  try {
+    // Fetch the orders by customer ID
+    const orders = await prisma.order.findMany({
+      where: { customerId: session.user.id },
+      include: {
+        pizza: {
+          include: {
+            PizzaTopping: {
+              select: {
+                topping: {
+                  select: {
+                    name: true,
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
+    });
+
+    // Transform the orders into the desired format
+    const formattedOrders = orders.map((order) => ({
+      name: order.pizza.name,
+      description: order.pizza.PizzaTopping.map(
+        (topping) => topping.topping.name
+      ).join(", "),
+      price: order.total,
+      image: order.pizza.photoUrl,
+      status: order.status,
+    }));
+
+    return { orders: formattedOrders };
+  } catch (error) {
+    console.error("Error fetching orders:", error);
+    throw new Error("Could not fetch orders. Please try again later.");
+  }
+}

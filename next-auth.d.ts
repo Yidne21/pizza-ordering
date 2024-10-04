@@ -7,6 +7,7 @@ declare module "next-auth" {
     id: string;
     email: string;
     role: {
+      id: string;
       name: string;
       permissions: Array<{
         action: string;
@@ -20,6 +21,7 @@ declare module "next-auth" {
       id: string;
       email: string;
       role: {
+        [x: string]: any;
         name: string;
         permissions: Array<{
           action: string;

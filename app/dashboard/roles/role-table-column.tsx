@@ -8,7 +8,7 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import UpdateRolePopUp from "./update-role-popup";
 
 export type Role = {
-  id: number;
+  id: string;
   name: string;
   permissions: string[];
   createdAt: string;

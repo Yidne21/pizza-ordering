@@ -5,23 +5,6 @@ import { createAbility } from "@/abilities/abilities";
 import { redirect } from "next/navigation";
 import { Subjects, Actions } from "@/utils/contants";
 
-const data = [
-  {
-    id: 1,
-    name: "Admin",
-    createdAt: "2021-10-10",
-    permissions: ["create", "read", "update", "delete"],
-    status: "Active",
-  },
-  {
-    id: 2,
-    name: "User",
-    createdAt: "2021-10-10",
-    permissions: ["read"],
-    status: "InActive",
-  },
-];
-
 async function Roles() {
   const session = await getServerSession(authOptions);
 
@@ -39,7 +22,7 @@ async function Roles() {
 
   return (
     <>
-      <RoleTable data={data} />
+      <RoleTable/>
     </>
   );
 }

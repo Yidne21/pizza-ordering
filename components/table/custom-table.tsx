@@ -56,7 +56,7 @@ const CustomeTable = <T extends MRT_RowData>({
     };
 
     loadData();
-  }, [columnFilters, globalFilter]);
+  }, [columnFilters, fetchData, globalFilter]);
 
   // Trigger refetching for filtering
   useEffect(() => {
@@ -77,7 +77,7 @@ const CustomeTable = <T extends MRT_RowData>({
     if (!isLoading) {
       refetchData();
     }
-  }, [columnFilters, globalFilter]);
+  }, [columnFilters, fetchData, globalFilter, isLoading]);
 
   const [open, setOpen] = useState(false);
   const handleModalClose = () => {

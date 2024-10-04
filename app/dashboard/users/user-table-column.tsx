@@ -6,7 +6,7 @@ import { Box, Switch } from "@mui/material";
 import DeleteIcon from "@mui/icons-material/Delete";
 
 export type User = {
-  id: number;
+  id: string;
   name: string;
   email: string;
   phone: string;

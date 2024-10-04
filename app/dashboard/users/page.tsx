@@ -5,23 +5,6 @@ import { createAbility } from "@/abilities/abilities";
 import { redirect } from "next/navigation";
 import { Subjects, Actions } from "@/utils/contants";
 
-const data = [
-  {
-    id: 1,
-    name: "John Doe",
-    email: "jondoe@gmail.com",
-    phone: "1234567890",
-    status: "Active",
-  },
-  {
-    id: 2,
-    name: "Jane Doe",
-    email: "jondoe@gmail.com",
-    phone: "1234567890",
-    status: "Inactive",
-  },
-];
-
 async function Users() {
   const session = await getServerSession(authOptions);
 
@@ -39,7 +22,7 @@ async function Users() {
 
   return (
     <>
-      <UserTable data={data} />
+      <UserTable />
     </>
   );
 }
