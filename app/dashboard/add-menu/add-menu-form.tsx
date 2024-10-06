@@ -6,44 +6,26 @@ import {
   Typography,
   Box,
   Button,
-  FormControlLabel,
-  Checkbox,
 } from "@mui/material";
 import InputFileUpload from "@/components/ui/input-file-upload";
 import SuccessPopUp from "@/components/ui/success-popup";
-import { Controller, useForm } from "react-hook-form";
+import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { addMenuFormTypes } from "@/utils/types";
 import { addMenuSchema } from "@/utils/schema";
 import InputField from "@/components/ui/input-field";
-import AddOutlinedIcon from "@mui/icons-material/AddOutlined";
 import { addMenu } from "@/lib/adminActions";
-import { useSession } from "next-auth/react";
-
-const toppings = [
-  { name: "Cheese", id: "13333" },
-  { name: "Tomato", id: "13334" },
-  { name: "Mushroom", id: "13335" },
-  { name: "Onion", id: "13336" },
-  { name: "Capsicum", id: "13337" },
-  { name: "Olives", id: "13338" },
-];
+import ToppingComponent from "./toppings";
+import { toast } from "react-toastify";
 
 function AddMenuForm() {
   const [open, setOpen] = useState(false);
-  const [isSubmitting, setIsSubmitting] = useState(false); // Track submission state
-  const [uploadError, setUploadError] = useState<string | null>(null); // Track upload errors
+  const [isSubmitting, setIsSubmitting] = useState(false); 
+  const [uploadError, setUploadError] = useState<string | null>(null);
   const handleClose = () => setOpen(!open);
-  const session = useSession();
-  
-  if(session){
-    console.log("###########");
-    
-    console.log(session);
+  const [selectedToppings, setSelectedToppings] = useState<string[]>([]);
 
-    console.log("###########");
-
-  }
+ 
 
   const {
     register,
@@ -57,29 +39,29 @@ function AddMenuForm() {
 
   // Handle form submission
   const handleFormSubmit = async (data: addMenuFormTypes) => {
-    setIsSubmitting(true); // Mark form as submitting
-    setUploadError(null); // Clear previous errors
+    setIsSubmitting(true); 
+    setUploadError(null); 
 
     try {
       const formData = new FormData();
       formData.append("name", data.name);
       formData.append("price", data.price.toString());
-      formData.append("image", data.logo[0]); // Assuming the logo is an array of files
-      formData.append("toppings", JSON.stringify(data.toppings)); // Send toppings as JSON
-
-      const response = await addMenu(formData); // Call the server action
+      formData.append("image", data.logo[0]); 
+      formData.append("toppings", JSON.stringify(data.toppings));
+      const response = await addMenu(formData);
 
       if (response.success) {
-        setOpen(true); // Open success popup
-        reset(); // Reset form after successful submission
+        setOpen(true); 
+        reset(); 
       } else {
-        setUploadError(response.message); // Show error if upload fails
+        setUploadError(response.message);
+        toast.error(uploadError);
       }
     } catch (error) {
       console.log(error);
-      setUploadError("Something went wrong."); // Handle error during submission
+      setUploadError("Something went wrong.");
     } finally {
-      setIsSubmitting(false); // Mark form as not submitting
+      setIsSubmitting(false);
     }
   };
 
@@ -94,7 +76,7 @@ function AddMenuForm() {
         padding: "30px 31px 320px 31px",
       }}
       component="form"
-      onSubmit={handleSubmit(handleFormSubmit)} // Use handleFormSubmit to process form
+      onSubmit={handleSubmit(handleFormSubmit)}
     >
       <Typography
         sx={{
@@ -157,73 +139,11 @@ function AddMenuForm() {
             >
               Toppings
             </Typography>
-            <Box
-              sx={{
-                display: "flex",
-                gap: { xs: "0px", lg: "15px" },
-                flexWrap: "wrap",
-                alignItems: "center",
-                alignContent: "center",
-                color: "var(--text-primary, rgba(0, 0, 0, 0.87))",
-                fontFamily: "Roboto",
-                fontSize: "16px",
-                fontStyle: "normal",
-                fontWeight: 400,
-                lineHeight: "150%",
-                letterSpacing: "0.15px",
-              }}
-            >
-              {toppings.map((topping, index) => (
-                <FormControlLabel
-                  key={index}
-                  control={
-                    <Controller
-                      name="toppings"
-                      control={control}
-                      defaultValue={[]}
-                      render={({ field }) => (
-                        <Checkbox
-                          {...field}
-                          value={topping.id}
-                          checked={field.value.includes(topping.id)}
-                          onChange={(e) => {
-                            if (e.target.checked) {
-                              field.onChange([...field.value, e.target.value]);
-                            } else {
-                              field.onChange(
-                                field.value.filter(
-                                  (val) => val !== e.target.value
-                                )
-                              );
-                            }
-                          }}
-                          sx={{
-                            "&.Mui-checked": {
-                              color: "#FF8100",
-                            },
-                          }}
-                        />
-                      )}
-                    />
-                  }
-                  label={topping.name}
-                />
-              ))}
-              <Button
-                startIcon={<AddOutlinedIcon />}
-                sx={{
-                  display: "flex",
-                  padding: "5px",
-                  alignItems: "center",
-                  gap: "10px",
-                  borderRadius: "3px",
-                  background: "#FF8100",
-                  color: "#FFF",
-                }}
-              >
-                Add
-              </Button>
-            </Box>
+            <ToppingComponent 
+            control={control}
+            selectedToppings={selectedToppings}
+            setSelectedToppings={setSelectedToppings}
+            />              
           </Box>
 
           {/* Input Field for Price */}
@@ -265,13 +185,6 @@ function AddMenuForm() {
       >
         {isSubmitting ? "Submitting..." : "Submit"}
       </Button>
-
-      {/* Show upload error if any */}
-      {uploadError && (
-        <Typography color="error" sx={{ mt: 2 }}>
-          {uploadError}
-        </Typography>
-      )}
 
       {/* Success Pop-up */}
       <SuccessPopUp

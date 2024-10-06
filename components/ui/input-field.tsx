@@ -14,6 +14,7 @@ type InputFieldProps<T extends FieldValues> = {
   error?: FieldError;
   value?: string;
   size?: "small" | "medium";
+  defaultValue?: string;
 };
 
 const InputField = <T extends FieldValues>({
@@ -24,6 +25,7 @@ const InputField = <T extends FieldValues>({
   error,
   value,
   size,
+  defaultValue
 }: InputFieldProps<T>) => {
   return (
     <>
@@ -35,6 +37,7 @@ const InputField = <T extends FieldValues>({
         value={value}
         fullWidth
         size={size}
+        defaultValue={defaultValue}
       />
       {error?.message && (
         <Typography sx={{ color: "red", fontSize: "12px" }}>

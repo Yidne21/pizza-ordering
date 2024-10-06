@@ -7,11 +7,8 @@ import { Order } from "./order-table-column";
 import { filterOrders } from "@/lib/adminActions";
 import { MRT_ColumnFiltersState } from "material-react-table";
 
-type OrderTableProps = {
-  resturantId: string;
-}
 
-function OrderTabel(props: OrderTableProps) {
+function OrderTabel() {
   const [data, setData] = useState<Order[]>([]);
 
   // Memoize fetchData to prevent unnecessary re-renders
@@ -35,9 +32,9 @@ function OrderTabel(props: OrderTableProps) {
       global: params.globalFilter,
     };
 
-    const result = await filterOrders(filters, props.resturantId);
+    const result = await filterOrders(filters);
     setData(result.orders);
-  }, [props.resturantId]);
+  }, []);
 
   return (
     <CustomeTable

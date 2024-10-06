@@ -12,14 +12,14 @@ import AddRolePopUp from "@/app/dashboard/roles/add-role-popup";
 import AddUserPopUp from "@/app/dashboard/users/add-user-popup";
 
 type CustomeTableProps<T extends MRT_RowData> = {
-  data: T[]; // Data is passed as a prop, assuming it's fetched via SSR
-  columns: MRT_ColumnDef<T>[]; // Table columns configuration
-  maxHeight: string; // Maximum height for the table scroll
-  title: string; // Optional title for the table
+  data: T[];
+  columns: MRT_ColumnDef<T>[]; 
+  maxHeight: string; 
+  title: string; 
   fetchData: (params: {
     filters: MRT_ColumnFiltersState;
     globalFilter: string;
-  }) => Promise<void>; // Function to fetch server-side data
+  }) => Promise<void>;
 };
 
 const CustomeTable = <T extends MRT_RowData>({

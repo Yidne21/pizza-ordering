@@ -29,39 +29,57 @@ enum RoleStatus {
   INACTIVE
 }
 
+enum PermissionType {
+  SYSTEM
+  RESTURANT
+}
+
+enum UserType {
+  SYSTEM
+  RESTURANT
+}
+
+enum RoleType {
+  SYSTEM
+  RESTURANT
+}
+
 model User {
-  id        String      @id @default(cuid())
-  email     String      @unique
-  password  String
-  name      String?
-  phone     String
-  location  String
-  status    UserStatus  @default(ACTIVE)
-  role      Role        @relation(fields: [roleId], references: [id])
-  roleId    String
-  resturant      Resturant?        @relation(fields: [resturantId], references: [id])
-  resturantId    String?
-  createdAt DateTime    @default(now())
-  updatedAt DateTime    @updatedAt
-  Orders    Order[]
+  id          String     @id @default(cuid())
+  email       String     @unique
+  password    String
+  name        String?
+  phone       String
+  location    String
+  status      UserStatus @default(ACTIVE)
+  type        UserType   @default(SYSTEM)
+  role        Role      @relation(fields: [roleId], references: [id])
+  roleId      String
+  resturant   Resturant? @relation(fields: [resturantId], references: [id])
+  resturantId String?
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+  Orders      Order[]
 }
 
 model Role {
-  id            String             @id @default(cuid())
-  name          String             @unique
-  status        RoleStatus         @default(ACTIVE)
-  resturant   Resturant? @relation(fields: [resturantId], references: [id])
+  id          String             @id @default(cuid())
+  name        String             
+  status      RoleStatus         @default(ACTIVE)
+  resturant   Resturant?         @relation(fields: [resturantId], references: [id], onDelete: Cascade)
   resturantId String?
-  createdAt DateTime    @default(now())
-  updatedAt DateTime    @updatedAt
-  permissions   RoleOnPermission[]
-  users         User[]
+  type        RoleType           @default(SYSTEM)
+  createdAt   DateTime           @default(now())
+  updatedAt   DateTime           @updatedAt
+  permissions RoleOnPermission[]
+  users       User[]
 }
 
 model Permission {
   id      String             @id @default(cuid())
   action  String
   subject String
+  type    PermissionType     @default(SYSTEM)
   roles   RoleOnPermission[]
 }
 
@@ -73,25 +91,21 @@ model RoleOnPermission {
 
   permissionId String
   permission   Permission @relation(fields: [permissionId], references: [id], onDelete: Cascade)
-
-  @@unique([roleId, permissionId])
 }
 
 model Resturant {
-  id            String          @id @default(cuid())
-  name          String
-  location      String
-  phone         String
-  email         String
-  logoUrl       String
-  createdAt     DateTime        @default(now())
-  updatedAt     DateTime        @updatedAt
-  Pizza         Pizza[]
-  Topping       Topping[]
-  User          User[]
-  Role          Role[]
+  id        String   @id @default(cuid())
+  name      String
+  location  String
+  phone     String
+  email     String
+  logoUrl   String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  Pizza     Pizza[]
+  User      User[]
+  Role      Role[]
 }
-
 
 model Pizza {
   id           String         @id @default(cuid())
@@ -107,10 +121,8 @@ model Pizza {
 }
 
 model Topping {
-  id           String            @id @default(cuid())
-  resturant    Resturant      @relation(fields: [resturantId], references: [id])
-  resturantId  String
-  name         String
+  id           String         @id @default(cuid())
+  name         String         @unique
   createdAt    DateTime       @default(now())
   updatedAt    DateTime       @updatedAt
   PizzaTopping PizzaTopping[]
@@ -118,7 +130,7 @@ model Topping {
 }
 
 model PizzaTopping {
-  id        String      @id @default(cuid())
+  id        String   @id @default(cuid())
   pizza     Pizza    @relation(fields: [pizzaId], references: [id])
   pizzaId   String
   topping   Topping  @relation(fields: [toppingId], references: [id])
@@ -128,22 +140,22 @@ model PizzaTopping {
 }
 
 model Order {
-  id         String         @id @default(cuid())
-  customer   User        @relation(fields: [customerId], references: [id])
-  customerId String
-  pizza      Pizza       @relation(fields: [pizzaId], references: [id])
-  pizzaId    String
-  status     OrderStatus @default(PREPARING)
-  toppings   String[]
-  quantity   Int
-  total      Float
-  OrderTopping  OrderTopping[]
-  createdAt  DateTime    @default(now())
-  updatedAt  DateTime    @updatedAt
+  id           String         @id @default(cuid())
+  customer     User           @relation(fields: [customerId], references: [id])
+  customerId   String
+  pizza        Pizza          @relation(fields: [pizzaId], references: [id])
+  pizzaId      String
+  status       OrderStatus    @default(PREPARING)
+  toppings     String[]
+  quantity     Int
+  total        Float
+  OrderTopping OrderTopping[]
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime       @updatedAt
 }
 
 model OrderTopping {
-  id        String      @id @default(cuid())
+  id        String   @id @default(cuid())
   order     Order    @relation(fields: [orderId], references: [id])
   orderId   String
   topping   Topping  @relation(fields: [toppingId], references: [id])

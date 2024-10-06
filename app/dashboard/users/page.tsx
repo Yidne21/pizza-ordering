@@ -3,7 +3,19 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/auth";
 import { createAbility } from "@/abilities/abilities";
 import { redirect } from "next/navigation";
-import { Subjects, Actions } from "@/utils/contants";
+import { Subjects, Actions } from "@/utils/permissionSetting";
+import { filterUsers } from "@/lib/adminActions";
+import { User } from "./user-table-column";
+
+type Filters = {
+  global?: string;
+  [key: string]: string | number | null | undefined;
+};
+
+async function fetchUsers( filters: Filters): Promise<User[]> {
+  const result = await filterUsers(filters);
+  return result.users;
+}
 
 async function Users() {
   const session = await getServerSession(authOptions);
@@ -20,15 +32,12 @@ async function Users() {
     redirect("/403");
   }
 
-  const resturantId = session.user.resturantId;
 
-  if(!resturantId){
-    redirect("/403");
-  }
+  const users = await fetchUsers({});
 
   return (
     <>
-      <UserTable resturantId={resturantId}/>
+      <UserTable initialUsers={users}/>
     </>
   );
 }

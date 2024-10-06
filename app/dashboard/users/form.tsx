@@ -8,7 +8,7 @@ import {
   Select,
   MenuItem,
   ListItemText,
-  Typography,
+  InputLabel,
 } from "@mui/material";
 import InputField from "@/components/ui/input-field";
 import { Controller, useForm } from "react-hook-form";
@@ -16,16 +16,21 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { addUserFormTypes } from "@/utils/types";
 import { addUserSchema } from "@/utils/schema";
 import { addUser } from "@/lib/adminActions";
+import { toast } from "react-toastify";
+
+type role = {
+  id: string;
+  name: string;
+}
 
 type FormProps = {
-  roles: string[];
+  roles: role[]
   isEdit: boolean;
+  onClose: () => void;
 };
 
 function Form(props: FormProps) {
-  const [isSubmitting, setIsSubmitting] = useState(false); // Track submission state
-  const [addError, setAddError] = useState<string | null>(null); // Track upload errors
-
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const {
     register,
     control,
@@ -38,7 +43,6 @@ function Form(props: FormProps) {
 
   const handleAddUser = async (data: addUserFormTypes) => {
     setIsSubmitting(true);
-    setAddError(null);
 
     try {
       const formData = new FormData();
@@ -53,8 +57,12 @@ function Form(props: FormProps) {
 
       if (response.success) {
         reset();
+        setIsSubmitting(false);
+        toast.success(response.message);
+        props.onClose();
       } else {
-        setAddError(response.message);
+        setIsSubmitting(false);
+        toast.error(response.message)
       }
     } catch (error) {
       console.log(error);
@@ -119,16 +127,29 @@ function Form(props: FormProps) {
         }}
       >
         <FormControl>
+        <InputLabel
+        sx={{
+          color: '#000',
+          fontWeight: 400,
+          fontSize: '12px',
+          "&.Mui-focused": {
+            color: '#000',
+          }
+        }}
+      >
+        Select Role
+      </InputLabel>
+
           <Controller
-            name="role" // Register 'role' field
+            name="role"
             control={control}
-            defaultValue={props.roles[0]} // Set default value to first role
             render={({ field }) => (
               <Select
                 {...field}
+                value={field.value}
+                placeholder="Select Role"
                 label="Select Role"
-                value={field.value} // Controlled by react-hook-form
-                onChange={field.onChange} // Handle changes
+                onChange={field.onChange}
                 sx={{
                   "& .MuiSelect-icon": {
                     color: "#000",
@@ -140,13 +161,13 @@ function Form(props: FormProps) {
                 }}
               >
                 {props.roles.map((role) => (
-                  <MenuItem key={role} value={role}>
+                  
+                  <MenuItem key={role.id} value={role.id}>
                     <ListItemText
-                      primary={role}
+                      primary={role.name}
                       primaryTypographyProps={{
                         sx: {
                           color: "#000",
-                          textAlign: "center",
                           fontFeatureSettings: "'liga' off, 'clig' off",
                           fontFamily: "Roboto",
                           fontSize: "12px",
@@ -167,7 +188,7 @@ function Form(props: FormProps) {
           variant="contained"
           sx={{
             display: "flex",
-            width: "231px",
+            width: "150px",
             height: "var(--7, 56px)",
             padding: "10px 20px",
             justifyContent: "center",
@@ -191,11 +212,6 @@ function Form(props: FormProps) {
         >
           {props.isEdit ? "Edit" : "Add"}
         </Button>
-        {addError && (
-          <Typography color="error" sx={{ mt: 2 }}>
-            {addError}
-          </Typography>
-        )}
       </Box>
     </Box>
   );

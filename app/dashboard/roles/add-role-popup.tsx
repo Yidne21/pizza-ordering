@@ -1,32 +1,90 @@
-import React from "react";
+'use client'
+import { useEffect, useState, useCallback, useMemo } from "react";
+import { Box, Typography } from "@mui/material";  // Material UI components
 import CustomModal from "@/components/ui/Modal";
-import Form from "./form";
+import AddForm from "./add-form";
+import { getResturantPermission } from "@/lib/adminActions";
+
+
+type Permission = {
+  id: string;
+  action: string;
+  subject: string;
+};
 
 export type AddRolePopUpProps = {
   open: boolean;
   onClose: () => void;
 };
 
-const permissions = [
-  "Update Order Status",
-  "See Orders",
-  "See Customers",
-  "Add Users",
-];
+function AddRolePopUp({ open, onClose }: AddRolePopUpProps) {
+  const [permissions, setPermissions] = useState<Permission[]>([]);
+  const [error, setError] = useState<string | undefined>(undefined);
+  const [loading, setIsLoading] = useState(false);
 
-const role = {
-  name: "",
-  permissions,
-};
-function AddRolePopUp(props: AddRolePopUpProps) {
+
+
+  const getPermissions = useCallback(async () => {
+    setIsLoading(true);
+    try {
+      const result = await getResturantPermission();
+      if (result.success) {
+        setPermissions(result.permissions);
+      } else {
+        setError(result.message);
+      }
+    } catch {
+      setError("Failed to fetch permissions");
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (open) {
+      getPermissions();
+    }
+  }, [open, getPermissions]);
+
+  const role = useMemo(() => ({
+    name: "",
+    permissions,
+  }), [permissions]);
+
   return (
     <CustomModal
-      open={props.open}
-      onClose={props.onClose}
-      width="505px"
-      height="461px"
+      open={open}
+      onClose={onClose}
+      width="40%"
+      height="100%"
     >
-      <Form role={role} isEdit={false} />
+      {loading ? (
+        <Box
+          display="flex"
+          flexDirection="column"
+          alignItems="center"
+          justifyContent="center"
+          height="100%"
+        >
+          <Typography variant="h6" mt={2}>
+            Loading permissions...
+          </Typography>
+        </Box>
+      ) : error ? (
+        <Box
+          display="flex"
+          flexDirection="column"
+          alignItems="center"
+          justifyContent="center"
+          height="100%"
+        >
+          <Typography variant="h6" color="error" align="center">
+            Error: {error}
+          </Typography>
+        </Box>
+      ) : (
+        <AddForm role={role} onClose={onClose} />
+      )}
     </CustomModal>
   );
 }

@@ -5,7 +5,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/auth";
 import { createAbility } from "@/abilities/abilities";
 import { redirect } from "next/navigation";
-import { Subjects, Actions } from "@/utils/contants";
+import { Subjects, Actions } from "@/utils/permissionSetting";
 
 async function AddMenu() {
   const session = await getServerSession(authOptions);
@@ -22,6 +22,7 @@ async function AddMenu() {
     redirect("/403");
   }
 
+
   return (
     <Box
       sx={{
@@ -31,7 +32,8 @@ async function AddMenu() {
         width: "100%",
       }}
     >
-      <AddMenuForm />
+      <AddMenuForm 
+      />
     </Box>
   );
 }

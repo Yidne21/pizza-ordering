@@ -8,13 +8,12 @@ import { filterRoles } from "@/lib/adminActions";
 import { MRT_ColumnFiltersState } from "material-react-table";
 
 type RoleTableProps = {
-  resturantId: string;
+  initialRoles: Role[];
 }
 
 function RoleTable(props: RoleTableProps) {
-  const [data, setData] = useState<Role[]>([]);
+  const [data, setData] = useState<Role[]>(props.initialRoles);
 
-  // Memoize fetchData to prevent unnecessary re-renders
   const fetchData = useCallback(
     async (params: {
       filters: MRT_ColumnFiltersState;
@@ -39,13 +38,10 @@ function RoleTable(props: RoleTableProps) {
         ...formattedFilters,
         global: params.globalFilter,
       };
-
-      console.log(filters);
-
-      const result = await filterRoles(filters, props.resturantId);
+      const result = await filterRoles(filters);
       setData(result.roles);
     },
-    [props.resturantId]
+    [ props.initialRoles]
   );
 
   return (

@@ -4,7 +4,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/auth";
 import { createAbility } from "@/abilities/abilities";
 import { redirect } from "next/navigation";
-import { Subjects, Actions } from "@/utils/contants";
+import { Subjects, Actions } from "@/utils/permissionSetting";
 
 const Orders = async () => {
   const session = await getServerSession(authOptions);
@@ -29,7 +29,7 @@ const Orders = async () => {
 
   return (
     <>
-      <OrderTable resturantId={resturantId}/>
+      <OrderTable/>
     </>
   );
 };

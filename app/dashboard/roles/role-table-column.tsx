@@ -6,11 +6,21 @@ import { Box, Switch } from "@mui/material";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import DeleteIcon from "@mui/icons-material/Delete";
 import UpdateRolePopUp from "./update-role-popup";
+import { updateRoleStatus, deleteRole } from "@/lib/adminActions";
+import { toast } from "react-toastify";
+
+
+type Permission = {
+  id: string;
+  roleId: string;
+  action: string;
+  subject: string;
+}
 
 export type Role = {
   id: string;
   name: string;
-  permissions: string[];
+  permissions: Permission[];
   createdAt: string;
   status: string;
 };
@@ -29,17 +39,28 @@ const columns: MRT_ColumnDef<Role>[] = [
     accessorKey: "actions",
     header: "Actions",
     Cell: ({ row }) => {
-      const [checked, setChecked] = useState(
-        row.original.status === "APPROVED"
-      );
 
-      const handleSwitchChange = (
+      
+      //update role status
+      const [checked, setChecked] = useState(
+        row.original.status === "ACTIVE"
+      );
+      const status = row.original.status === "ACTIVE" ? "Active": "Inactive"; 
+
+      const handleSwitchChange = async (
         event: React.ChangeEvent<HTMLInputElement>
       ) => {
         const newChecked = event.target.checked;
         setChecked(newChecked);
+        const newNewStatus = row.original.status === "ACTIVE" ? "INACTIVE" : "ACTIVE";
+       const result = await updateRoleStatus({status: newNewStatus, roleId: row.original.id});
+       if (result.success){
+        toast.success(result.message);
+       }
+
       };
 
+      // update role
       const [open, setOpen] = useState(false);
       const handleModalClose = () => {
         setOpen(!open);
@@ -51,8 +72,21 @@ const columns: MRT_ColumnDef<Role>[] = [
 
       const role = {
         name: row.original.name,
+        roleId: row.original.id,
         permissions: row.original.permissions,
       };
+
+      // delete role
+
+      const handleDelete = async ()=> {
+        const result = await deleteRole({roleId: row.original.id});
+        if(result.success){
+          toast.success(result.message);
+        }else {
+          toast.error(result.message)
+        }
+      }
+
 
       return (
         <Box
@@ -62,26 +96,30 @@ const columns: MRT_ColumnDef<Role>[] = [
             gap: "10px",
           }}
         >
+
+          {/* status switch */}
           <Box
             sx={{
-              backgroundColor: "rgba(0, 128, 0, 0.10)",
+              backgroundColor: status === 'Active' ? "rgba(0, 128, 0, 0.10)" : "#ffbaba",
               borderRadius: "10px",
               display: "flex",
               alignItems: "center",
-              color: "#14a514",
+              color: status === 'Active' ? "#14a514" : "#ff0000",
               justifyContent: "center",
               width: "102px",
             }}
           >
-            {row.original.status}
+            {status}
             <Switch
               {...label}
               size="small"
-              color="success"
+              color={status === "Active" ? "success": "error"}
               checked={checked}
               onChange={handleSwitchChange}
             />
           </Box>
+
+          {/* eye icon */}
           <Box
             sx={{
               display: "flex",
@@ -109,6 +147,8 @@ const columns: MRT_ColumnDef<Role>[] = [
               role={role}
             />
           </Box>
+
+          {/* delete icon */}
           <Box
             sx={{
               display: "flex",
@@ -128,6 +168,7 @@ const columns: MRT_ColumnDef<Role>[] = [
                 height: "24px",
                 cursor: "pointer",
               }}
+              onClick={handleDelete}
             />
           </Box>
         </Box>

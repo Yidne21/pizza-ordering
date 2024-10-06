@@ -1,6 +1,7 @@
 // seed.ts
 import { PrismaClient } from "@prisma/client";
 import bcrypt from "bcrypt";
+import { PermissionType, RoleType } from "@prisma/client";
 
 const prisma = new PrismaClient();
 
@@ -20,7 +21,6 @@ async function main() {
   const adminRole = await prisma.role.create({
     data: {
       name: "superAdmin",
-      resturantId: resturant.id,
     },
   });
 
@@ -109,28 +109,6 @@ async function main() {
     ],
   });
 
-
-  // Example Toppings for the above resturant
-  const toppings = [
-    { name: "Pepperoni" },
-    { name: "Mushrooms" },
-    { name: "Onions" },
-    { name: "Sausage" },
-    { name: "Bacon" },
-    { name: "Extra cheese" },
-    { name: "Black olives" },
-    { name: "Green peppers" },
-    { name: "Pineapple" },
-    { name: "Spinach" },
-  ];
-
-await prisma.topping.createMany({
-    data: toppings.map((topping) => ({
-      resturantId: resturant.id,
-      name: topping.name,
-    })),
-  });
-
   // roles might be created by superAdmin
 
   await prisma.role.createMany({
@@ -138,22 +116,31 @@ await prisma.topping.createMany({
       {
         name: "kitchenManager",
         resturantId: resturant.id,
+        type: RoleType.RESTURANT
       },
       {
         name: "deliveryManager",
         resturantId: resturant.id,
+        type: RoleType.RESTURANT
+
       },
       {
         name: "chef",
         resturantId: resturant.id,
+        type: RoleType.RESTURANT
+
       },
       {
         name: "manager",
         resturantId: resturant.id,
+        type: RoleType.RESTURANT
+
       },
       {
         name: "reception",
         resturantId: resturant.id,
+        type: RoleType.RESTURANT
+
       },
     ],
   });
@@ -164,95 +151,104 @@ await prisma.topping.createMany({
     {
       action: "read",
       subject: "roles",
+      type: PermissionType.RESTURANT
     },
     {
       action: "create",
       subject: "role",
+      type: PermissionType.RESTURANT
+
     },
     {
       action: "update",
       subject: "role",
+      type: PermissionType.RESTURANT
+
     },
     {
       action: "delete",
       subject: "role",
+      type: PermissionType.RESTURANT
+
     },
 
     {
       action: "read",
       subject: "users",
-    },
-    {
-      action: "create",
-      subject: "user",
-    },
-    {
-      action: "update",
-      subject: "user",
-    },
-    {
-      action: "delete",
-      subject: "user",
-    },
+      type: PermissionType.RESTURANT
 
-    {
-      action: "read",
-      subject: "toppings",
     },
     {
       action: "create",
-      subject: "topping",
+      subject: "user",
+      type: PermissionType.RESTURANT
+
     },
     {
       action: "update",
-      subject: "topping",
+      subject: "user",
+      type: PermissionType.RESTURANT
+
     },
     {
       action: "delete",
-      subject: "topping",
+      subject: "user",
+      type: PermissionType.RESTURANT
+
     },
 
     {
       action: "read",
       subject: "orders",
+      type: PermissionType.RESTURANT
+
     },
     {
       action: "update",
       subject: "order",
+      type: PermissionType.RESTURANT
+
     },
     {
       action: "delete",
       subject: "order",
-    },
+      type: PermissionType.RESTURANT
 
-    {
-      action: "read",
-      subject: "orderHistory",
     },
     {
       action: "update",
       subject: "orderStatus",
+      type: PermissionType.RESTURANT
+
     },
 
     {
       action: "read",
       subject: "menus",
+      type: PermissionType.RESTURANT
+
     },
     {
       action: "create",
       subject: "menu",
+      type: PermissionType.RESTURANT
+
     },
     {
       action: "update",
       subject: "menu",
+      type: PermissionType.RESTURANT
+
     },
     {
       action: "delete",
       subject: "menu",
+      type: PermissionType.RESTURANT
+
     },
   ];
 
- await prisma.permission.createMany({
+  await prisma.permission.createMany({
     data: permissions.map((permission) => ({
       ...permission,
     })),
