@@ -1,53 +1,29 @@
 import React from "react";
 import PizzaSection from "@/components/Home/pizza-section";
 import PizzaCard from "@/components/Home/card/pizza-card";
-import { Box } from "@mui/material";
+import { Box, Typography } from "@mui/material";
+import { fetchOrderByCustomerId } from "@/lib/customerActions";
 
-function OrderHistory() {
-  const Orders = [
-    {
-      name: "Margherita",
-      description: "Tomato, Mozzarella, Bell Peppers, Onions, Olives",
-      price: 150,
-      image: "/pizza.jpg",
-      status: "Ordered",
-    },
-    {
-      name: "Margherita",
-      description: "Tomato, Mozzarella, Bell Peppers, Onions, Olives",
-      price: 150,
-      image: "/pizza.jpg",
-      status: "Ordered",
-    },
-    {
-      name: "Margherita",
-      description: "Tomato, Mozzarella, Bell Peppers, Onions, Olives",
-      price: 150,
-      image: "/pizza.jpg",
-      status: "Ordered",
-    },
-    {
-      name: "Margherita",
-      description: "Tomato, Mozzarella, Bell Peppers, Onions, Olives",
-      price: 150,
-      image: "/pizza.jpg",
-      status: "Received",
-    },
-    {
-      name: "Margherita",
-      description: "Tomato, Mozzarella, Bell Peppers, Onions, Olives",
-      price: 150,
-      image: "/pizza.jpg",
-      status: "Received",
-    },
-    {
-      name: "Margherita",
-      description: "Tomato, Mozzarella, Bell Peppers, Onions, Olives",
-      price: 150,
-      image: "/pizza.jpg",
-      status: "Received",
-    },
-  ];
+
+async function OrderHistory() {
+  const results = await fetchOrderByCustomerId();
+
+  if (!results) {
+    return (
+      <Box
+        sx={{
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          height: '100vh', // Full viewport height
+        }}
+      >
+        <Typography variant="h4" color="text.secondary">
+          Loading...
+        </Typography>
+      </Box>
+    );
+  }
 
   return (
     <PizzaSection title="Order History">
@@ -59,7 +35,7 @@ function OrderHistory() {
           gap: "25px", // Space between items
         }}
       >
-        {Orders.map((order, index) => (
+        {results.orders.map((order, index) => (
           <Box
             key={index}
             sx={{

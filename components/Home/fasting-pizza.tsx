@@ -5,59 +5,13 @@ import CustomeSlider from "../ui/slider";
 import PizzaSection from "./pizza-section";
 import PizzaCard from "./card/pizza-card";
 import { Box, styled } from "@mui/material";
+import { Pizza } from "./popular-pizza";
 
-const fastingPizzas = [
-  {
-    id: "1",
-    name: "Margherita",
-    description: "Tomato, Mozzarella, Bell Peppers, Onions, Olives",
-    price: 150,
-    image: "/pizza.jpg",
-    restaurant: "Azmera Pizza",
-    restaurantAvatar: "/images/ava.svg",
-  },
-  {
-    id: "188",
-    name: "Pepperoni",
-    description: "Tomato, Mozzarella, Pepperoni",
-    price: 180,
-    image: "/pizza.jpg",
-    restaurant: "Pepperoni Palace",
-    restaurantAvatar: "/images/pepperoni.svg",
-  },
-  {
-    id: "2",
+interface FastingPizaaProps {
+  pizzas: Pizza[];
+}
 
-    name: "BBQ Chicken",
-    description: "BBQ sauce, Chicken, Mozzarella",
-    price: 200,
-    image: "/pizza.jpg",
-    restaurant: "BBQ Grill",
-    restaurantAvatar: "/images/bbq.svg",
-  },
-
-  {
-    id: "3",
-
-    name: "Pepperoni",
-    description: "Tomato, Mozzarella, Pepperoni",
-    price: 180,
-    image: "/pizza.jpg",
-    restaurant: "Pepperoni Palace",
-    restaurantAvatar: "/images/pepperoni.svg",
-  },
-  {
-    id: "4",
-
-    name: "BBQ Chicken",
-    description: "BBQ sauce, Chicken, Mozzarella",
-    price: 200,
-    image: "/pizza.jpg",
-    restaurant: "BBQ Grill",
-    restaurantAvatar: "/images/bbq.svg",
-  },
-];
-function FastingPizza() {
+function FastingPizza(props: FastingPizaaProps) {
   const CustomSliderWrapper = styled(Box)({
     "& .slick-slide": {
       padding: "10px 10px",
@@ -97,7 +51,7 @@ function FastingPizza() {
     <PizzaSection title="Fasting Pizza">
       <CustomSliderWrapper>
         <CustomeSlider settings={settings}>
-          {fastingPizzas.map((pizza, index) => (
+          {props.pizzas.map((pizza, index) => (
             <PizzaCard key={index} pizza={pizza} />
           ))}
         </CustomeSlider>

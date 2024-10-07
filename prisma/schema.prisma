@@ -130,7 +130,7 @@ model Topping {
 }
 
 model PizzaTopping {
-  id        String   @id @default(cuid())
+  id        String   @id @default(cuid()) @unique
   pizza     Pizza    @relation(fields: [pizzaId], references: [id])
   pizzaId   String
   topping   Topping  @relation(fields: [toppingId], references: [id])
@@ -146,7 +146,6 @@ model Order {
   pizza        Pizza          @relation(fields: [pizzaId], references: [id])
   pizzaId      String
   status       OrderStatus    @default(PREPARING)
-  toppings     String[]
   quantity     Int
   total        Float
   OrderTopping OrderTopping[]

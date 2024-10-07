@@ -34,34 +34,24 @@ const rollToActive = keyframes`
   }
 `;
 
-const orderDetails = {
-  name: "Margherita",
-  price: 150,
-  toppings: [
-    { name: "Cheese", id: "13333" },
-    { name: "Tomato", id: "13334" },
-    { name: "Mushroom", id: "13335" },
-    { name: "Onion", id: "13336" },
-    { name: "Capsicum", id: "13337" },
-    { name: "Olives", id: "13338" },
-  ],
-  images: ["/images/featPizza2.png", "/images/featPizza3.png"],
-};
+type Topping = {
+  name: string;
+  id: string;
+}
 
-const toppings = [
-  { name: "Cheese", id: "13333" },
-  { name: "Tomato", id: "13334" },
-  { name: "Mushroom", id: "13335" },
-  { name: "Onion", id: "13336" },
-  { name: "Capsicum", id: "13337" },
-  { name: "Olives", id: "13338" },
-];
-
-interface OrderDetail {
+export type PizzaDetail = {
+  name: string;
+  price: number;
+  toppings: Topping[];
+  images: string[];
   pizzaId: string;
 }
 
-function OrderDetailCard({ pizzaId }: OrderDetail) {
+interface OrderDetail {
+  pizzaDetail: PizzaDetail;
+}
+
+function OrderDetailCard({ pizzaDetail }: OrderDetail) {
   const [activeImage, setActiveImage] = useState<string>(
     "/images/featPizza2.png"
   );
@@ -70,7 +60,7 @@ function OrderDetailCard({ pizzaId }: OrderDetail) {
   const imageRef = useRef<HTMLImageElement | null>(null);
   const [open, setOpen] = useState<boolean>(false);
   const [Quantity, setQuantity] = useState<number>(1);
-  const [totalPrice, setTotalPrice] = useState<number>(orderDetails.price);
+  const [totalPrice, setTotalPrice] = useState<number>(pizzaDetail.price);
   const [isSubmitting, setIsSubmitting] = useState(false); // Track submission state
   const [orderError, setOrderError] = useState<string | null>(null); // Track upload errors
 
@@ -93,11 +83,9 @@ function OrderDetailCard({ pizzaId }: OrderDetail) {
     try {
       const formData = new FormData();
       formData.append("toppings", JSON.stringify(data.toppings));
-      formData.append("pizzaId", pizzaId);
+      formData.append("pizzaId", pizzaDetail.pizzaId);
       formData.append("total", totalPrice.toString());
       formData.append("quantity", Quantity.toString());
-      console.log(formData.get("toppings"));
-
       const response = await createOrder(formData); // Call the server action
 
       if (response.success) {
@@ -108,8 +96,7 @@ function OrderDetailCard({ pizzaId }: OrderDetail) {
         setOrderError(response.message);
         reset();
       }
-    } catch (error) {
-      console.log(error);
+    } catch {
       setOrderError("Something went wrong.");
     } finally {
       setIsSubmitting(false);
@@ -120,13 +107,13 @@ function OrderDetailCard({ pizzaId }: OrderDetail) {
 
   const handleAdd = () => {
     const newQuantity = Quantity + 1;
-    const newPrice = orderDetails.price * newQuantity;
+    const newPrice = pizzaDetail.price * newQuantity;
     setQuantity(newQuantity);
     setTotalPrice(newPrice);
   };
   const handleRemove = () => {
     const newQuantity = Quantity - 1;
-    const newPrice = totalPrice - orderDetails.price;
+    const newPrice = totalPrice - pizzaDetail.price;
     if (newQuantity < 1) return;
     setQuantity(newQuantity);
     setTotalPrice(newPrice);
@@ -195,7 +182,7 @@ function OrderDetailCard({ pizzaId }: OrderDetail) {
               flexDirection: "column",
             }}
           >
-            {orderDetails.images.map((image, index) => (
+            {pizzaDetail.images.map((image, index) => (
               <CardMedia
                 key={index}
                 component="img"
@@ -257,7 +244,7 @@ function OrderDetailCard({ pizzaId }: OrderDetail) {
               letterSpacing: { xs: "0.6px", lg: "2.4px" },
             }}
           >
-            Margherita
+            {pizzaDetail.name}
           </Typography>
 
           {/* Toppings */}
@@ -270,7 +257,7 @@ function OrderDetailCard({ pizzaId }: OrderDetail) {
               alignContent: "center",
             }}
           >
-            {toppings.map((topping, index) => (
+            {pizzaDetail.toppings.map((topping, index) => (
               <FormControlLabel
                 key={index}
                 control={

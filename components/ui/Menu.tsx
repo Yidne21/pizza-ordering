@@ -8,16 +8,23 @@ import {
   ListItemText,
   Box,
 } from "@mui/material";
+import { updateOrderStatus } from "@/lib/adminActions";
+import { toast } from "react-toastify";
+
 
 type DropdownProps = {
   status: string;
+  orderId: string;
 };
 
 export default function Dropdown(props: DropdownProps) {
   const [status, setStatus] = useState(props.status);
 
-  const handleChange = (event: any) => {
-    setStatus(event.target.value);
+  const handleChange = async (event: any) => {
+    const newStatus = event.target.value;
+    setStatus(newStatus);
+    const result = await updateOrderStatus({status: newStatus, orderId: props.orderId});
+    toast.success(result.message);
   };
 
   const sharedStyle = {

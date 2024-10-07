@@ -1,7 +1,7 @@
 "use server";
 
 import { prisma } from "@/lib/prisma";
-import { Prisma, OrderStatus, RoleStatus, } from "@prisma/client";
+import { Prisma, OrderStatus, RoleStatus, UserStatus, } from "@prisma/client";
 import { Role } from "@/app/dashboard/roles/role-table-column";
 import { User } from "@/app/dashboard/users/user-table-column";
 import { imageUploader } from "./fileUpload";
@@ -104,6 +104,7 @@ export async function filterOrders({
 
     // Transform the orders into the desired format
     const formattedOrders = orders.map((order) => ({
+      id: order.id,
       pizza: order.pizza.name,
       toppings: order.pizza.PizzaTopping.map((topping) => topping.topping.name),
       quantity: order.quantity,
@@ -124,7 +125,7 @@ export async function updateOrderStatus({
   status,
 }: {
   orderId: string;
-  status: "READY" | "PREPARING" | "DELIVERED";
+  status: string;
 }) {
 
   const session = await getServerSession(authOptions);
@@ -140,13 +141,18 @@ export async function updateOrderStatus({
     redirect("/403");
   }
 
+  const newStatus = status === "DELIVERED" ? OrderStatus.DELIVERED : status === "PREPARING" ? OrderStatus.PREPARING : OrderStatus.READY;
 
+
+  console.log(newStatus);
   try {
     // Update the order status
     await prisma.order.update({
       where: { id: orderId },
-      data: { status },
+      data: { status: newStatus },
     });
+
+    revalidatePath('/dashboard/orders', 'page');
 
     return { success: true, message: "Order status updated successfully" };
   } catch (error) {
@@ -472,7 +478,7 @@ export async function updateRoleStatus({status, roleId}: {status: string; roleId
   
     const ability = createAbility(role.permissions);
   
-    if (!ability.can(Actions.read, Subjects.role)) {
+    if (!ability.can(Actions.update, Subjects.role)) {
       redirect("/403");
     }
 
@@ -707,6 +713,79 @@ export async function addUser(formData: FormData) {
     return { success: false, message: "Something went wrong" };
   }
 }
+
+
+export async function updateUserStatus({status, userId}: {status: string; userId: string;}) {
+  try {
+
+    const session = await getServerSession(authOptions);
+  
+    if(!session){
+      redirect('/login')
+    }    
+    const { role } = session.user;
+  
+    const ability = createAbility(role.permissions);
+  
+    if (!ability.can(Actions.update, Subjects.user)) {
+      redirect("/403");
+    }
+
+    const userStatus = status === "ACTIVE" ? UserStatus.ACTIVE : UserStatus.INACTIVE;
+    await prisma.user.update({
+      where: {
+        id: userId
+      },
+      data: {
+        status: userStatus
+      }
+    })
+
+    revalidatePath("/dashboard/users", "page");
+    return { success: true, message: "user status updated successfully" };
+  } catch (error) {
+    console.error("Error updating user status:", error);
+    return { success: false, message: "Something went wrong" };
+  }
+}
+
+export async function deleteUser({userId}: {userId: string;}) {
+  const session = await getServerSession(authOptions);
+  
+  if(!session){
+    redirect('/login')
+  }  
+  const { role } = session.user;
+
+  const ability = createAbility(role.permissions);
+
+  if (!ability.can(Actions.delete, Subjects.user)) {
+    redirect("/403");
+  }
+
+  try {
+
+    await prisma.user.delete({
+      where: {
+        id: userId
+      }
+    })
+    revalidatePath('/dashboard/users', 'page');
+    return { success: true, message: "user deleted successfully" };
+  } catch (error) {
+      // Check if it's a Prisma error
+      if (error instanceof Prisma.PrismaClientKnownRequestError) {
+        // P2025 indicates that the record doesn't exist
+        if (error.code === 'P2025') {
+          return { success: false, message: "user not found or already deleted." };
+        }
+      }
+
+    console.error("Error adding User:", error);
+    return { success: false, message: "Something went wrong" };
+  }
+}
+
 
 export async function getToppingsByPizzaId(pizzaId: string) {
   try {

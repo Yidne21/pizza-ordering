@@ -39,8 +39,6 @@ const columns: MRT_ColumnDef<Role>[] = [
     accessorKey: "actions",
     header: "Actions",
     Cell: ({ row }) => {
-
-      
       //update role status
       const [checked, setChecked] = useState(
         row.original.status === "ACTIVE"

@@ -9,6 +9,7 @@ import Done from "@mui/icons-material/Done";
 import OrderDetail from "./order-detail";
 
 export type Order = {
+  id: string;
   pizza: string;
   toppings: string[];
   quantity: number;
@@ -97,7 +98,7 @@ const columns: MRT_ColumnDef<Order>[] = [
 
       return (
         <Box>
-          {status !== "DELIVERED" && <Dropdown status={status} />}
+          {status !== "DELIVERED" && <Dropdown status={status} orderId={row.original.id}/>}
           {status === "DELIVERED" && (
             <Box
               sx={{

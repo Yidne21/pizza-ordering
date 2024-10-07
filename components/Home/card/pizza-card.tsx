@@ -15,12 +15,12 @@ import { useRouter } from "next/navigation";
 
 type PizzaCardProps = {
   pizza: {
-    id?: string;
+    id: string;
     image: string;
     name: string;
-    description: string;
-    restaurantAvatar?: string;
-    restaurant?: string;
+    toppings: string;
+    logo?: string;
+    resturant?: string;
     price: number;
     status?: string;
   };
@@ -31,7 +31,7 @@ type PizzaCardProps = {
 const PizzaCard = (props: PizzaCardProps) => {
   const router = useRouter();
   const handleOrder = () => {
-    router.push(`order/${props.pizza.id}`);
+    router.push(`/order/${props.pizza.id}`);
   };
 
   return (
@@ -102,7 +102,7 @@ const PizzaCard = (props: PizzaCardProps) => {
               mt: "10px",
             }}
           >
-            {props.pizza.description}
+            {props.pizza.toppings}
           </Typography>
 
           <Box
@@ -221,7 +221,7 @@ const PizzaCard = (props: PizzaCardProps) => {
               }}
             >
               <Avatar
-                src={props.pizza.restaurantAvatar}
+                src={props.pizza.logo}
                 sx={{
                   width: "65px",
                   height: "65px",
@@ -239,7 +239,7 @@ const PizzaCard = (props: PizzaCardProps) => {
                   letterSpacing: "0.6px",
                 }}
               >
-                {props.pizza.restaurant}
+                {props.pizza.resturant}
               </Typography>
             </Box>
           </>

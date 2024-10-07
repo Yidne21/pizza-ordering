@@ -1,61 +1,39 @@
-import React from "react";
+'use client'
+
 import { Box } from "@mui/material";
 import PizzaCard from "./card/pizza-card";
 import PizzaSection from "./pizza-section";
+import React, { useEffect, useRef } from 'react';
+import { useSearchParams } from 'next/navigation';
 
-const pizzaData = [
-  {
-    id: "1",
-    name: "Margherita",
-    description: "Tomato, Mozzarella, Bell Peppers, Onions, Olives",
-    price: 150,
-    image: "/pizza.jpg",
-    restaurant: "Azmera Pizza",
-    restaurantAvatar: "/images/ava.svg",
-  },
-  {
-    id: "188",
-    name: "Pepperoni",
-    description: "Tomato, Mozzarella, Pepperoni",
-    price: 180,
-    image: "/pizza.jpg",
-    restaurant: "Pepperoni Palace",
-    restaurantAvatar: "/images/pepperoni.svg",
-  },
-  {
-    id: "2",
+export type Pizza = {
+  id: string;
+  name: string;
+  price: number;
+  image: string;
+  resturant: string;
+  logo: string;
+  toppings: string;
+}
 
-    name: "BBQ Chicken",
-    description: "BBQ sauce, Chicken, Mozzarella",
-    price: 200,
-    image: "/pizza.jpg",
-    restaurant: "BBQ Grill",
-    restaurantAvatar: "/images/bbq.svg",
-  },
+interface PopularPizaaProps {
+  pizzas: Pizza[];
+}
 
-  {
-    id: "3",
+function PopularPizza(props: PopularPizaaProps) {
+  const searchParams = useSearchParams(); 
+  const searchQuery = searchParams.get("search");
+  const sectionRef = useRef<HTMLDivElement | null>(null);
 
-    name: "Pepperoni",
-    description: "Tomato, Mozzarella, Pepperoni",
-    price: 180,
-    image: "/pizza.jpg",
-    restaurant: "Pepperoni Palace",
-    restaurantAvatar: "/images/pepperoni.svg",
-  },
-  {
-    id: "4",
+  useEffect(() => {
+    if (searchQuery && sectionRef.current) {
+      window.scrollTo({
+        top: sectionRef.current.offsetTop + 200,
+        behavior: "smooth",
+      });
+    }
+  }, [searchQuery]);
 
-    name: "BBQ Chicken",
-    description: "BBQ sauce, Chicken, Mozzarella",
-    price: 200,
-    image: "/pizza.jpg",
-    restaurant: "BBQ Grill",
-    restaurantAvatar: "/images/bbq.svg",
-  },
-];
-
-function PopularPizza() {
   return (
     <PizzaSection title="Popular Pizza">
       <Box
@@ -66,13 +44,14 @@ function PopularPizza() {
           width: "100%",
         }}
       >
-        {pizzaData.map((pizza, index) => (
+        {props.pizzas.map((pizza, index) => (
           <Box
             key={index}
             sx={{
               flexBasis: { xs: "100%", sm: "48%", md: "30%" }, // Flex basis for 1, 2, or 3 columns
               maxWidth: { xs: "100%", sm: "48%", md: "30%" }, // Ensures each column takes up correct width
             }}
+            ref={sectionRef}
           >
             <PizzaCard pizza={pizza} />
           </Box>

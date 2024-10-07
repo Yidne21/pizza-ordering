@@ -1,15 +1,34 @@
-import React from "react";
+"use client";
+
+import React, { useState } from "react";
+import { useRouter } from "next/navigation";
 import { Box, Typography, TextField, Button } from "@mui/material";
 import Image from "next/image";
 
 const HeroSection = () => {
+  const [searchQuery, setSearchQuery] = useState("");
+  const router = useRouter();
+
+  const handleSearch = () => {
+    if (searchQuery) {
+      router.push(`/?search=${searchQuery}`);
+    } else {
+      router.push(`/`);
+    }
+  };
+
+  const handleKeyPress = (e: { key: string; }) => {
+    if (e.key === "Enter") {
+      handleSearch();
+    }
+  };
+
   return (
     <Box
       sx={{
         display: "flex",
         justifyContent: "space-between",
-        background:
-          "linear-gradient(180deg, #FFF 0%, #FFC993 76%, #FFF8F1 100%)",
+        background: "linear-gradient(180deg, #FFF 0%, #FFC993 76%, #FFF8F1 100%)",
         overflow: "hidden",
       }}
     >
@@ -70,6 +89,9 @@ const HeroSection = () => {
 
         <TextField
           placeholder="Search"
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          onKeyDown={handleKeyPress}
           fullWidth
           sx={{
             cursor: "pointer",
@@ -103,6 +125,7 @@ const HeroSection = () => {
                 <Button
                   variant="contained"
                   color="primary"
+                  onClick={handleSearch}
                   sx={{
                     borderRadius: "360%",
                     backgroundColor: "#FF890F",
