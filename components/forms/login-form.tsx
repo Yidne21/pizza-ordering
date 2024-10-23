@@ -48,12 +48,7 @@ const LoginForm = () => {
       );
 
       if (updatedSession?.user?.role?.name) {
-        // Redirect based on role
-        if (updatedSession.user.role.name === "customer") {
           navigation.push("/");
-        } else {
-          navigation.push("/dashboard");
-        }
       }
     }
   };
