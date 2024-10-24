@@ -37,7 +37,7 @@ const rollToActive = keyframes`
 type Topping = {
   name: string;
   id: string;
-}
+};
 
 export type PizzaDetail = {
   name: string;
@@ -45,7 +45,7 @@ export type PizzaDetail = {
   toppings: Topping[];
   images: string[];
   pizzaId: string;
-}
+};
 
 interface OrderDetail {
   pizzaDetail: PizzaDetail;
@@ -72,7 +72,7 @@ function OrderDetailCard({ pizzaDetail }: OrderDetail) {
     setOpen(!open);
   };
 
-  const { control, handleSubmit, reset } = useForm<orderFormTypes>({
+  const { control, handleSubmit, reset, formState } = useForm<orderFormTypes>({
     resolver: zodResolver(orderSchema),
   });
 
@@ -238,7 +238,7 @@ function OrderDetailCard({ pizzaDetail }: OrderDetail) {
             sx={{
               color: "#000",
               fontFamily: "Roboto",
-              fontSize: { xs: "20px", lg: "80px" },
+              fontSize: { xs: "20px", lg: "40px" },
               fontWeight: 700,
               lineHeight: { xs: "18px", lg: "75px" },
               letterSpacing: { xs: "0.6px", lg: "2.4px" },
@@ -264,7 +264,9 @@ function OrderDetailCard({ pizzaDetail }: OrderDetail) {
                   <Controller
                     name="toppings"
                     control={control}
-                    defaultValue={[]}
+                    defaultValue={pizzaDetail.toppings.map(
+                      (topping) => topping.id
+                    )}
                     render={({ field }) => (
                       <Checkbox
                         {...field}
@@ -294,6 +296,16 @@ function OrderDetailCard({ pizzaDetail }: OrderDetail) {
               />
             ))}
           </Box>
+
+          {formState.errors.toppings && (
+            <Typography
+              sx={{
+                color: "red",
+              }}
+            >
+              {formState.errors.toppings.message}
+            </Typography>
+          )}
 
           {/* Quantity Selector */}
           <Box

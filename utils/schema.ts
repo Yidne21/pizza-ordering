@@ -99,7 +99,9 @@ export const addMenuSchema = z.object({
 });
 
 export const orderSchema = z.object({
-  toppings: z.array(z.string()).min(1, { message: "topping is required!" }),
+  toppings: z
+    .array(z.string())
+    .min(1, { message: "please select atleast one topping" }),
 });
 
 export const addRoleSchema = z.object({
