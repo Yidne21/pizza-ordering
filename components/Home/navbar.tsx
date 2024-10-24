@@ -7,9 +7,11 @@ import MenuOutlinedIcon from "@mui/icons-material/MenuOutlined";
 import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
 import { signOut } from "next-auth/react";
+import { useState } from "react";
 
 const Navbar = () => {
   const router = useRouter();
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   const handleRegister = () => {
     router.push("/manager-sign-up");
@@ -28,6 +30,10 @@ const Navbar = () => {
   if (session) {
     role = session?.user?.role?.name;
   }
+
+  const handleMenuClick = () => {
+    setIsMenuOpen(!isMenuOpen);
+  };
 
   return (
     <Box
@@ -207,9 +213,70 @@ const Navbar = () => {
             fontSize: "50px",
             width: "var(--3, 24px)",
             height: "var(--3, 24px)",
+            cursor: "pointer",
+            "&:hover": {
+              color: "#FF890F",
+            },
           }}
+          onClick={handleMenuClick}
         />
       </Box>
+      {isMenuOpen && (
+        <Box
+          sx={{
+            position: "absolute",
+            top: "60px",
+            right: "0rem",
+            background: "#FFF8F1",
+            boxShadow: "0px 0px 15px 0px rgba(255, 129, 0, 0.20)",
+            padding: "1rem",
+            display: "flex",
+            flexDirection: "column",
+            gap: "1rem",
+            zIndex: 100,
+          }}
+        >
+          <CustomLink href="/">
+            <Typography
+              sx={{
+                fontFamily: "Inter",
+                fontSize: "18px",
+                fontWeight: "700px",
+                lineHeight: "36px",
+                letterSpacing: "0.75px",
+              }}
+            >
+              Home
+            </Typography>
+          </CustomLink>
+          <CustomLink href="/orders">
+            <Typography
+              sx={{
+                fontFamily: "Inter",
+                fontSize: "18px",
+                fontWeight: "700px",
+                lineHeight: "36px",
+                letterSpacing: "0.75px",
+              }}
+            >
+              Orders
+            </Typography>
+          </CustomLink>
+          <CustomLink href="/about">
+            <Typography
+              sx={{
+                fontFamily: "Inter",
+                fontSize: "18px",
+                fontWeight: "700px",
+                lineHeight: "36px",
+                letterSpacing: "0.75px",
+              }}
+            >
+              Who we are
+            </Typography>
+          </CustomLink>
+        </Box>
+      )}
     </Box>
   );
 };
