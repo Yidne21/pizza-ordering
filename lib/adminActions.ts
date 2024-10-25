@@ -1,7 +1,7 @@
 "use server";
 
 import { prisma } from "@/lib/prisma";
-import { Prisma, OrderStatus, RoleStatus, UserStatus, } from "@prisma/client";
+import { Prisma, OrderStatus, RoleStatus, UserStatus } from "@prisma/client";
 import { Role } from "@/app/dashboard/roles/role-table-column";
 import { User } from "@/app/dashboard/users/user-table-column";
 import { imageUploader } from "./fileUpload";
@@ -13,7 +13,6 @@ import { authOptions } from "@/auth";
 import { createAbility } from "@/abilities/abilities";
 import { redirect } from "next/navigation";
 import { Subjects, Actions } from "@/utils/permissionSetting";
-
 
 // orders
 export async function filterOrders({
@@ -27,14 +26,13 @@ export async function filterOrders({
   pizzaName?: string;
   global?: string;
 }) {
-
   const session = await getServerSession(authOptions);
-  
-  if(!session){
-    redirect('/login')
+
+  if (!session) {
+    redirect("/login");
   }
   const resturantId = session.user.resturantId;
-  
+
   const { role } = session.user;
 
   const ability = createAbility(role.permissions);
@@ -43,7 +41,6 @@ export async function filterOrders({
     redirect("/403");
   }
 
-  
   const where: Prisma.OrderWhereInput = {
     pizza: {
       resturantId: resturantId, // Filter orders by the restaurant ID
@@ -127,12 +124,11 @@ export async function updateOrderStatus({
   orderId: string;
   status: string;
 }) {
-
   const session = await getServerSession(authOptions);
-  
-  if(!session){
-    redirect('/login')
-  }  
+
+  if (!session) {
+    redirect("/login");
+  }
   const { role } = session.user;
 
   const ability = createAbility(role.permissions);
@@ -141,8 +137,12 @@ export async function updateOrderStatus({
     redirect("/403");
   }
 
-  const newStatus = status === "DELIVERED" ? OrderStatus.DELIVERED : status === "PREPARING" ? OrderStatus.PREPARING : OrderStatus.READY;
-
+  const newStatus =
+    status === "DELIVERED"
+      ? OrderStatus.DELIVERED
+      : status === "PREPARING"
+      ? OrderStatus.PREPARING
+      : OrderStatus.READY;
 
   console.log(newStatus);
   try {
@@ -152,7 +152,7 @@ export async function updateOrderStatus({
       data: { status: newStatus },
     });
 
-    revalidatePath('/dashboard/orders', 'page');
+    revalidatePath("/dashboard/orders", "page");
 
     return { success: true, message: "Order status updated successfully" };
   } catch (error) {
@@ -164,22 +164,20 @@ export async function updateOrderStatus({
 // menu
 export async function addMenu(formData: FormData) {
   try {
-
     const session = await getServerSession(authOptions);
-  
-    if(!session){
-      redirect('/login')
+
+    if (!session) {
+      redirect("/login");
     }
     const resturantId = session.user.resturantId;
-    
+
     const { role } = session.user;
-  
+
     const ability = createAbility(role.permissions);
-  
+
     if (!ability.can(Actions.create, Subjects.menu) || !resturantId) {
       redirect("/403");
     }
-
 
     const name = formData.get("name") as string;
     const price = parseFloat(formData.get("price") as string);
@@ -194,12 +192,15 @@ export async function addMenu(formData: FormData) {
 
     const parsedToppings = JSON.parse(toppings) as string[]; // Parse toppings
 
+    console.log("parsedToppings$$$$$$$$$$$");
+    console.log("parsedToppings$$$$$$$$$$$", parsedToppings);
+
     // Create or find existing toppings
     const createdToppings = await Promise.all(
       parsedToppings.map(async (toppingName) => {
         // Check if topping exists
-        const existingTopping = await prisma.topping.findUnique({
-          where: { name: toppingName }
+        const existingTopping = await prisma.topping.findFirst({
+          where: { name: toppingName, resturantId },
         });
 
         // If it exists, return it; otherwise, create a new one
@@ -207,12 +208,14 @@ export async function addMenu(formData: FormData) {
           return existingTopping;
         } else {
           return await prisma.topping.create({
-            data: { name: toppingName }
+            data: {
+              name: toppingName,
+              resturantId,
+            },
           });
         }
       })
     );
-
     // Create the new pizza in the database
     const newPizza = await prisma.pizza.create({
       data: {
@@ -236,36 +239,38 @@ export async function addMenu(formData: FormData) {
       })
     );
 
-    return { success: true, message: "Menu added successfully", pizza: newPizza };
+    return {
+      success: true,
+      message: "Menu added successfully",
+      pizza: newPizza,
+    };
   } catch (error) {
     console.error("Error adding menu:", error);
     return { success: false, message: "Something went wrong" };
   }
 }
 
-
 export async function filterRoles({
   name,
   status,
-  global
+  global,
 }: {
   name?: string;
   status?: RoleStatus;
   global?: string;
 }) {
   try {
-
     const session = await getServerSession(authOptions);
-  
-    if(!session){
-      redirect('/login')
+
+    if (!session) {
+      redirect("/login");
     }
     const resturantId = session.user.resturantId;
-    
+
     const { role } = session.user;
-  
+
     const ability = createAbility(role.permissions);
-  
+
     if (!ability.can(Actions.read, Subjects.roles) || !resturantId) {
       redirect("/403");
     }
@@ -275,14 +280,12 @@ export async function filterRoles({
       resturantId: resturantId,
       type: RoleType.RESTURANT,
       ...(status ? { status } : {}), // Ensure status is of type RoleStatus
-      ...(name ? { name: { contains: name, mode: 'insensitive' } } : {}), // Handle name filtering
+      ...(name ? { name: { contains: name, mode: "insensitive" } } : {}), // Handle name filtering
     };
 
     // Apply a global filter across customer phone and pizza name fields
     if (global) {
-      whereFilters.OR = [
-        { name: { contains: global, mode: "insensitive" } },
-      ];
+      whereFilters.OR = [{ name: { contains: global, mode: "insensitive" } }];
     }
 
     const roles = await prisma.role.findMany({
@@ -301,24 +304,22 @@ export async function filterRoles({
         },
       },
       orderBy: {
-        createdAt: 'desc', // Sort by createdAt in descending order (latest first)
+        createdAt: "desc", // Sort by createdAt in descending order (latest first)
       },
     });
-    
-
 
     // Format the result to match your expected output
-    const formattedRoles: Role[] = roles.map(role => ({
+    const formattedRoles: Role[] = roles.map((role) => ({
       id: role.id,
       name: role.name,
-      createdAt: role.createdAt.toISOString().split('T')[0], // Format as YYYY-MM-DD
-      permissions: role.permissions.map(rp => {
+      createdAt: role.createdAt.toISOString().split("T")[0], // Format as YYYY-MM-DD
+      permissions: role.permissions.map((rp) => {
         return {
-        roleId: role.id,
-        id: rp.permission.id,
-        action: rp.permission.action,
-        subject: rp.permission.subject,
-        }
+          roleId: role.id,
+          id: rp.permission.id,
+          action: rp.permission.action,
+          subject: rp.permission.subject,
+        };
       }),
       status: role.status,
     }));
@@ -330,7 +331,6 @@ export async function filterRoles({
   }
 }
 
-
 // roles
 export async function addRole(formData: FormData) {
   const name = formData.get("name") as string;
@@ -338,12 +338,12 @@ export async function addRole(formData: FormData) {
   const parsedPermissions: string[] = JSON.parse(permissions);
 
   const session = await getServerSession(authOptions);
-  
-  if(!session){
-    redirect('/login')
+
+  if (!session) {
+    redirect("/login");
   }
   const resturantId = session.user.resturantId;
-  
+
   const { role } = session.user;
 
   const ability = createAbility(role.permissions);
@@ -352,14 +352,13 @@ export async function addRole(formData: FormData) {
     redirect("/403");
   }
 
-
   try {
     // Create the new role
     const role = await prisma.role.create({
       data: {
         name: name,
         resturantId: resturantId,
-        type: RoleType.RESTURANT
+        type: RoleType.RESTURANT,
       },
     });
 
@@ -375,8 +374,7 @@ export async function addRole(formData: FormData) {
 
     // Execute all rolePermission creations
     await Promise.all(rolePermissions);
-    revalidatePath('/dashboard/roles', 'page');
-
+    revalidatePath("/dashboard/roles", "page");
 
     return { success: true, message: "Role added successfully" };
   } catch (error) {
@@ -392,12 +390,12 @@ export async function updateRole(formData: FormData) {
   const parsedPermissions: string[] = JSON.parse(permissions);
 
   const session = await getServerSession(authOptions);
-  
-  if(!session){
-    redirect('/login')
+
+  if (!session) {
+    redirect("/login");
   }
   const resturantId = session.user.resturantId;
-  
+
   const { role } = session.user;
 
   const ability = createAbility(role.permissions);
@@ -424,7 +422,9 @@ export async function updateRole(formData: FormData) {
       select: { permissionId: true },
     });
 
-    const existingPermissionIds = existingPermissions.map((rp) => rp.permissionId);
+    const existingPermissionIds = existingPermissions.map(
+      (rp) => rp.permissionId
+    );
 
     // Step 3: Unlink any permissions that are no longer present in parsedPermissions
     const permissionsToUnlink = existingPermissionIds.filter(
@@ -457,7 +457,7 @@ export async function updateRole(formData: FormData) {
     }
 
     // Revalidate the path to update the dashboard roles view
-    revalidatePath('/dashboard/roles', 'page');
+    revalidatePath("/dashboard/roles", "page");
 
     return { success: true, message: "Role updated successfully" };
   } catch (error) {
@@ -466,31 +466,37 @@ export async function updateRole(formData: FormData) {
   }
 }
 
-export async function updateRoleStatus({status, roleId}: {status: string; roleId: string;}) {
+export async function updateRoleStatus({
+  status,
+  roleId,
+}: {
+  status: string;
+  roleId: string;
+}) {
   try {
-
     const session = await getServerSession(authOptions);
-  
-    if(!session){
-      redirect('/login')
-    }    
+
+    if (!session) {
+      redirect("/login");
+    }
     const { role } = session.user;
-  
+
     const ability = createAbility(role.permissions);
-  
+
     if (!ability.can(Actions.update, Subjects.role)) {
       redirect("/403");
     }
 
-    const roleStatus = status === "ACTIVE" ? RoleStatus.ACTIVE : RoleStatus.INACTIVE;
+    const roleStatus =
+      status === "ACTIVE" ? RoleStatus.ACTIVE : RoleStatus.INACTIVE;
     await prisma.role.update({
       where: {
-        id: roleId
+        id: roleId,
       },
       data: {
-        status: roleStatus
-      }
-    })
+        status: roleStatus,
+      },
+    });
 
     revalidatePath("/dashboard/orders", "page");
     return { success: true, message: "role status updated successfully" };
@@ -500,12 +506,12 @@ export async function updateRoleStatus({status, roleId}: {status: string; roleId
   }
 }
 
-export async function deleteRole({roleId}: {roleId: string;}) {
+export async function deleteRole({ roleId }: { roleId: string }) {
   const session = await getServerSession(authOptions);
-  
-  if(!session){
-    redirect('/login')
-  }  
+
+  if (!session) {
+    redirect("/login");
+  }
   const { role } = session.user;
 
   const ability = createAbility(role.permissions);
@@ -515,26 +521,32 @@ export async function deleteRole({roleId}: {roleId: string;}) {
   }
 
   try {
-
     await prisma.role.delete({
       where: {
-        id: roleId
-      }
-    })
-    revalidatePath('/dashboard/orders', 'page');
+        id: roleId,
+      },
+    });
+    revalidatePath("/dashboard/orders", "page");
     return { success: true, message: "Role deleted successfully" };
   } catch (error) {
-      // Check if it's a Prisma error
-      if (error instanceof Prisma.PrismaClientKnownRequestError) {
-        // P2003 indicates a foreign key constraint violation
-        if (error.code === 'P2003') {
-          return { success: false, message: "Cannot delete role: It is given to users delete that users first." };
-        }
-        // P2025 indicates that the record doesn't exist
-        if (error.code === 'P2025') {
-          return { success: false, message: "Role not found or already deleted." };
-        }
+    // Check if it's a Prisma error
+    if (error instanceof Prisma.PrismaClientKnownRequestError) {
+      // P2003 indicates a foreign key constraint violation
+      if (error.code === "P2003") {
+        return {
+          success: false,
+          message:
+            "Cannot delete role: It is given to users delete that users first.",
+        };
       }
+      // P2025 indicates that the record doesn't exist
+      if (error.code === "P2025") {
+        return {
+          success: false,
+          message: "Role not found or already deleted.",
+        };
+      }
+    }
 
     console.error("Error adding User:", error);
     return { success: false, message: "Something went wrong" };
@@ -545,14 +557,14 @@ export async function getResturantPermission() {
   try {
     const permissions = await prisma.permission.findMany({
       where: {
-        type: PermissionType.RESTURANT
+        type: PermissionType.RESTURANT,
       },
       select: {
         id: true,
         action: true,
         subject: true,
-      }
-    })
+      },
+    });
     return { success: true, permissions };
   } catch (error) {
     console.error("Error getting permissions :", error);
@@ -562,12 +574,12 @@ export async function getResturantPermission() {
 
 export async function getResturantRoles() {
   const session = await getServerSession(authOptions);
-  
-  if(!session){
-    redirect('/login')
+
+  if (!session) {
+    redirect("/login");
   }
   const resturantId = session.user.resturantId;
-  
+
   const { role } = session.user;
 
   const ability = createAbility(role.permissions);
@@ -576,17 +588,16 @@ export async function getResturantRoles() {
     redirect("/403");
   }
   try {
-
     const roles = await prisma.role.findMany({
       where: {
         type: RoleType.RESTURANT,
-        resturantId
+        resturantId,
       },
       select: {
         id: true,
         name: true,
-      }
-    })
+      },
+    });
     return { success: true, roles };
   } catch (error) {
     console.error("Error getting roles :", error);
@@ -595,50 +606,49 @@ export async function getResturantRoles() {
 }
 
 // users
-export async function filterUsers(
-  {
-    name,
-    email,
-    phone,
-    global
-  }: {
-    name?: string;
-    email?: string;
-    phone?: string;
-    global?: string;
-  },
-) {
+export async function filterUsers({
+  name,
+  email,
+  phone,
+  global,
+}: {
+  name?: string;
+  email?: string;
+  phone?: string;
+  global?: string;
+}) {
   try {
-
     const session = await getServerSession(authOptions);
-  
-    if(!session){
-      redirect('/login')
+
+    if (!session) {
+      redirect("/login");
     }
     const resturantId = session.user.resturantId;
-    
+
     const { role } = session.user;
-  
+
     const ability = createAbility(role.permissions);
-  
+
     if (!ability.can(Actions.read, Subjects.users) || !resturantId) {
       redirect("/403");
     }
 
-
     const whereFilters: Prisma.UserWhereInput = {
       resturantId: resturantId,
       type: UserType.RESTURANT,
-      ...(name ? { name: { contains: name, mode: 'insensitive' } } : {}),
-      ...(email ? { email: { contains: email, mode: 'insensitive' } } : {}),
-      ...(phone ? { phone: { contains: phone, mode: 'insensitive' } } : {}),
-      ...(global ? {
-        OR: [ // Adding OR clause for global search
-          { name: { contains: global, mode: 'insensitive' } },
-          { email: { contains: global, mode: 'insensitive' } },
-          { phone: { contains: global, mode: 'insensitive' } },
-        ]
-      } : {}),
+      ...(name ? { name: { contains: name, mode: "insensitive" } } : {}),
+      ...(email ? { email: { contains: email, mode: "insensitive" } } : {}),
+      ...(phone ? { phone: { contains: phone, mode: "insensitive" } } : {}),
+      ...(global
+        ? {
+            OR: [
+              // Adding OR clause for global search
+              { name: { contains: global, mode: "insensitive" } },
+              { email: { contains: global, mode: "insensitive" } },
+              { phone: { contains: global, mode: "insensitive" } },
+            ],
+          }
+        : {}),
     };
 
     // Fetch users based on the constructed filters
@@ -646,9 +656,9 @@ export async function filterUsers(
       where: whereFilters,
     });
     // Format the result to match your expected output
-    const formattedUsers: User[] = users.map(user => ({
+    const formattedUsers: User[] = users.map((user) => ({
       id: user.id,
-      name: user.name || '', // Handle potential null values
+      name: user.name || "", // Handle potential null values
       email: user.email,
       phone: user.phone,
       status: user.status, // Assuming status is a UserStatus enum
@@ -659,17 +669,16 @@ export async function filterUsers(
     console.error("Error fetching users:", error);
     return { users: [] }; // Return an empty array in case of error
   }
-};
+}
 
 export async function addUser(formData: FormData) {
-
   const session = await getServerSession(authOptions);
-  
-  if(!session){
-    redirect('/login')
+
+  if (!session) {
+    redirect("/login");
   }
   const resturantId = session.user.resturantId;
-  
+
   const { role } = session.user;
 
   const ability = createAbility(role.permissions);
@@ -678,35 +687,32 @@ export async function addUser(formData: FormData) {
     redirect("/403");
   }
 
-
-
-
   try {
-   const name = formData.get("name") as string;
-   const email = formData.get("email") as string;
-   const location = formData.get("location") as string;
-   const phone = formData.get("phoneNumber") as string;
-   const role = formData.get("role") as string;
+    const name = formData.get("name") as string;
+    const email = formData.get("email") as string;
+    const location = formData.get("location") as string;
+    const phone = formData.get("phoneNumber") as string;
+    const role = formData.get("role") as string;
 
-   const hashedPassword = await bcrypt.hash(
-    formData.get("password") as string,
-    10
-  );
+    const hashedPassword = await bcrypt.hash(
+      formData.get("password") as string,
+      10
+    );
 
-  await prisma.user.create({
-    data: {
-      name,
-      email,
-      location,
-      password: hashedPassword,
-      phone,
-      type: UserType.RESTURANT,
-      role: { connect: { id: role} },
-      resturant: {connect: {id: resturantId}}
-    }
-  })
+    await prisma.user.create({
+      data: {
+        name,
+        email,
+        location,
+        password: hashedPassword,
+        phone,
+        type: UserType.RESTURANT,
+        role: { connect: { id: role } },
+        resturant: { connect: { id: resturantId } },
+      },
+    });
 
-  revalidatePath('/dashboard/users', 'page');
+    revalidatePath("/dashboard/users", "page");
     return { success: true, message: "User added successfully" };
   } catch (error) {
     console.error("Error adding User:", error);
@@ -714,32 +720,37 @@ export async function addUser(formData: FormData) {
   }
 }
 
-
-export async function updateUserStatus({status, userId}: {status: string; userId: string;}) {
+export async function updateUserStatus({
+  status,
+  userId,
+}: {
+  status: string;
+  userId: string;
+}) {
   try {
-
     const session = await getServerSession(authOptions);
-  
-    if(!session){
-      redirect('/login')
-    }    
+
+    if (!session) {
+      redirect("/login");
+    }
     const { role } = session.user;
-  
+
     const ability = createAbility(role.permissions);
-  
+
     if (!ability.can(Actions.update, Subjects.user)) {
       redirect("/403");
     }
 
-    const userStatus = status === "ACTIVE" ? UserStatus.ACTIVE : UserStatus.INACTIVE;
+    const userStatus =
+      status === "ACTIVE" ? UserStatus.ACTIVE : UserStatus.INACTIVE;
     await prisma.user.update({
       where: {
-        id: userId
+        id: userId,
       },
       data: {
-        status: userStatus
-      }
-    })
+        status: userStatus,
+      },
+    });
 
     revalidatePath("/dashboard/users", "page");
     return { success: true, message: "user status updated successfully" };
@@ -749,12 +760,12 @@ export async function updateUserStatus({status, userId}: {status: string; userId
   }
 }
 
-export async function deleteUser({userId}: {userId: string;}) {
+export async function deleteUser({ userId }: { userId: string }) {
   const session = await getServerSession(authOptions);
-  
-  if(!session){
-    redirect('/login')
-  }  
+
+  if (!session) {
+    redirect("/login");
+  }
   const { role } = session.user;
 
   const ability = createAbility(role.permissions);
@@ -764,44 +775,44 @@ export async function deleteUser({userId}: {userId: string;}) {
   }
 
   try {
-
     await prisma.user.delete({
       where: {
-        id: userId
-      }
-    })
-    revalidatePath('/dashboard/users', 'page');
+        id: userId,
+      },
+    });
+    revalidatePath("/dashboard/users", "page");
     return { success: true, message: "user deleted successfully" };
   } catch (error) {
-      // Check if it's a Prisma error
-      if (error instanceof Prisma.PrismaClientKnownRequestError) {
-        // P2025 indicates that the record doesn't exist
-        if (error.code === 'P2025') {
-          return { success: false, message: "user not found or already deleted." };
-        }
+    // Check if it's a Prisma error
+    if (error instanceof Prisma.PrismaClientKnownRequestError) {
+      // P2025 indicates that the record doesn't exist
+      if (error.code === "P2025") {
+        return {
+          success: false,
+          message: "user not found or already deleted.",
+        };
       }
+    }
 
     console.error("Error adding User:", error);
     return { success: false, message: "Something went wrong" };
   }
 }
 
-
 export async function getToppingsByPizzaId(pizzaId: string) {
   try {
-
     const toppings = await prisma.pizzaTopping.findMany({
       where: {
-        pizzaId: pizzaId
+        pizzaId: pizzaId,
       },
       include: {
         topping: {
           select: {
             id: true,
             name: true,
-          }
-        }
-      }
+          },
+        },
+      },
     });
 
     return { success: true, toppings };
@@ -810,5 +821,42 @@ export async function getToppingsByPizzaId(pizzaId: string) {
     return { success: false, message: "Failed to fetch toppings" };
   } finally {
     await prisma.$disconnect();
+  }
+}
+
+export async function getToppingsByResturantId() {
+  const session = await getServerSession(authOptions);
+
+  if (!session) {
+    redirect("/login");
+  }
+  const resturantId = session.user.resturantId;
+
+  const { role } = session.user;
+
+  const ability = createAbility(role.permissions);
+
+  if (!ability.can(Actions.read, Subjects.toppings) || !resturantId) {
+    redirect("/403");
+  }
+
+  try {
+    const toppings = await prisma.topping.findMany({
+      where: {
+        resturantId: resturantId,
+      },
+      select: {
+        name: true,
+      },
+    });
+
+    return { success: true, toppings };
+  } catch (error) {
+    console.error("Error fetching toppings:", error);
+    return {
+      success: false,
+      message: "Failed to fetch toppings",
+      toppings: [],
+    };
   }
 }
