@@ -236,32 +236,6 @@ const Navbar = () => {
             zIndex: 100,
           }}
         >
-          <CustomLink href="/">
-            <Typography
-              sx={{
-                fontFamily: "Inter",
-                fontSize: "18px",
-                fontWeight: "700px",
-                lineHeight: "36px",
-                letterSpacing: "0.75px",
-              }}
-            >
-              Home
-            </Typography>
-          </CustomLink>
-          <CustomLink href="/orders">
-            <Typography
-              sx={{
-                fontFamily: "Inter",
-                fontSize: "18px",
-                fontWeight: "700px",
-                lineHeight: "36px",
-                letterSpacing: "0.75px",
-              }}
-            >
-              Orders
-            </Typography>
-          </CustomLink>
           <CustomLink href="/about">
             <Typography
               sx={{
@@ -275,6 +249,48 @@ const Navbar = () => {
               Who we are
             </Typography>
           </CustomLink>
+          {role && role != "customer" && (
+            <CustomLink href="/dashboard">
+              <Button
+                variant="contained"
+                sx={{
+                  background: "#FF890F",
+                  color: "#FFFF",
+                  padding: "10px 20px",
+                  borderRadius: "5px",
+                  fontFamily: "Inter",
+                  fontSize: "25px",
+                  fontWeight: 700,
+                  lineHeight: "36px",
+                  letterSpacing: "0.75px",
+                  textTransform: "capitalize",
+                }}
+              >
+                Dashboard
+              </Button>
+            </CustomLink>
+          )}
+
+          {role && role === "customer" && (
+            <Button
+              variant="contained"
+              sx={{
+                background: "#FF890F",
+                color: "#FFFF",
+                padding: "10px 20px",
+                borderRadius: "5px",
+                fontFamily: "Inter",
+                fontSize: "25px",
+                fontWeight: 700,
+                lineHeight: "36px",
+                letterSpacing: "0.75px",
+                textTransform: "capitalize",
+              }}
+              onClick={handleLogout}
+            >
+              Logout
+            </Button>
+          )}
         </Box>
       )}
     </Box>

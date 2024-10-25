@@ -6,8 +6,6 @@ import { PermissionType, RoleType } from "@prisma/client";
 const prisma = new PrismaClient();
 
 async function main() {
-
-
   const resturant = await prisma.resturant.create({
     data: {
       name: "Pizza Place",
@@ -24,6 +22,24 @@ async function main() {
     },
   });
 
+  const toppings = [
+    "Cheese",
+    "Pepperoni",
+    "Mushrooms",
+    "Onions",
+    "Sausage",
+    "Bacon",
+    "Extra cheese",
+    "Black olives",
+  ];
+
+  await prisma.topping.createMany({
+    data: toppings.map((topping) => ({
+      name: topping,
+      resturantId: resturant.id,
+    })),
+  });
+
   const hashedAdminPassword = await bcrypt.hash("123456", 10);
 
   await prisma.user.create({
@@ -34,7 +50,7 @@ async function main() {
       phone: "1234567890",
       location: "Admin Location",
       roleId: adminRole.id,
-      resturantId: resturant.id
+      resturantId: resturant.id,
     },
   });
 
@@ -116,31 +132,27 @@ async function main() {
       {
         name: "kitchenManager",
         resturantId: resturant.id,
-        type: RoleType.RESTURANT
+        type: RoleType.RESTURANT,
       },
       {
         name: "deliveryManager",
         resturantId: resturant.id,
-        type: RoleType.RESTURANT
-
+        type: RoleType.RESTURANT,
       },
       {
         name: "chef",
         resturantId: resturant.id,
-        type: RoleType.RESTURANT
-
+        type: RoleType.RESTURANT,
       },
       {
         name: "manager",
         resturantId: resturant.id,
-        type: RoleType.RESTURANT
-
+        type: RoleType.RESTURANT,
       },
       {
         name: "reception",
         resturantId: resturant.id,
-        type: RoleType.RESTURANT
-
+        type: RoleType.RESTURANT,
       },
     ],
   });
@@ -151,100 +163,85 @@ async function main() {
     {
       action: "read",
       subject: "roles",
-      type: PermissionType.RESTURANT
+      type: PermissionType.RESTURANT,
     },
     {
       action: "create",
       subject: "role",
-      type: PermissionType.RESTURANT
-
+      type: PermissionType.RESTURANT,
     },
     {
       action: "update",
       subject: "role",
-      type: PermissionType.RESTURANT
-
+      type: PermissionType.RESTURANT,
     },
     {
       action: "delete",
       subject: "role",
-      type: PermissionType.RESTURANT
-
+      type: PermissionType.RESTURANT,
     },
 
     {
       action: "read",
       subject: "users",
-      type: PermissionType.RESTURANT
-
+      type: PermissionType.RESTURANT,
     },
     {
       action: "create",
       subject: "user",
-      type: PermissionType.RESTURANT
-
+      type: PermissionType.RESTURANT,
     },
     {
       action: "update",
       subject: "user",
-      type: PermissionType.RESTURANT
-
+      type: PermissionType.RESTURANT,
     },
     {
       action: "delete",
       subject: "user",
-      type: PermissionType.RESTURANT
-
+      type: PermissionType.RESTURANT,
     },
 
     {
       action: "read",
       subject: "orders",
-      type: PermissionType.RESTURANT
-
+      type: PermissionType.RESTURANT,
     },
     {
       action: "update",
       subject: "order",
-      type: PermissionType.RESTURANT
-
+      type: PermissionType.RESTURANT,
     },
     {
       action: "delete",
       subject: "order",
-      type: PermissionType.RESTURANT
-
+      type: PermissionType.RESTURANT,
     },
     {
       action: "update",
       subject: "orderStatus",
-      type: PermissionType.RESTURANT
-
+      type: PermissionType.RESTURANT,
     },
 
     {
       action: "read",
       subject: "menus",
-      type: PermissionType.RESTURANT
-
+      type: PermissionType.RESTURANT,
     },
     {
       action: "create",
       subject: "menu",
-      type: PermissionType.RESTURANT
-
+      type: PermissionType.RESTURANT,
     },
     {
       action: "update",
       subject: "menu",
-      type: PermissionType.RESTURANT
-
+      type: PermissionType.RESTURANT,
     },
     {
       action: "delete",
       subject: "menu",
-      type: PermissionType.RESTURANT
-
+      type: PermissionType.RESTURANT,
     },
   ];
 
