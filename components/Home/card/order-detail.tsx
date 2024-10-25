@@ -55,6 +55,9 @@ function OrderDetailCard({ pizzaDetail }: OrderDetail) {
   const [activeImage, setActiveImage] = useState<string>(
     "/images/featPizza2.png"
   );
+  const [inactiveImages, setInactiveImages] = useState<string[]>(
+    pizzaDetail.images.filter((image) => image !== activeImage)
+  );
   const [isRolling, setIsRolling] = useState<boolean>(false);
   const [rollingImage, setRollingImage] = useState<string>("");
   const imageRef = useRef<HTMLImageElement | null>(null);
@@ -118,12 +121,17 @@ function OrderDetailCard({ pizzaDetail }: OrderDetail) {
     setQuantity(newQuantity);
     setTotalPrice(newPrice);
   };
-  // Handle the image click to trigger animation
+
+  // Handle the image click to trigger animation and swap images
   const handleImageClick = (image: string) => {
     setRollingImage(image);
     setIsRolling(true);
 
     setTimeout(() => {
+      setInactiveImages((prev) => [
+        ...prev.filter((img) => img !== image),
+        activeImage,
+      ]);
       setActiveImage(image);
       setIsRolling(false);
       setRollingImage("");
@@ -182,7 +190,7 @@ function OrderDetailCard({ pizzaDetail }: OrderDetail) {
               flexDirection: "column",
             }}
           >
-            {pizzaDetail.images.map((image, index) => (
+            {inactiveImages.map((image, index) => (
               <CardMedia
                 key={index}
                 component="img"

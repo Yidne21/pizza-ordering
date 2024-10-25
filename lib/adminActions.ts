@@ -192,9 +192,6 @@ export async function addMenu(formData: FormData) {
 
     const parsedToppings = JSON.parse(toppings) as string[]; // Parse toppings
 
-    console.log("parsedToppings$$$$$$$$$$$");
-    console.log("parsedToppings$$$$$$$$$$$", parsedToppings);
-
     // Create or find existing toppings
     const createdToppings = await Promise.all(
       parsedToppings.map(async (toppingName) => {
@@ -238,6 +235,8 @@ export async function addMenu(formData: FormData) {
         });
       })
     );
+
+    revalidatePath("/", "page");
 
     return {
       success: true,

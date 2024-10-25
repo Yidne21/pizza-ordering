@@ -37,6 +37,9 @@ export default function InputFileUpload<T extends FieldValues>({
   name,
   error,
 }: InputFileUploadProps<T>) {
+  const [fileName, setFileName] = React.useState<string | null>(null);
+
+  console.log("file", fileName);
   return (
     <Box
       sx={{
@@ -66,11 +69,29 @@ export default function InputFileUpload<T extends FieldValues>({
         <VisuallyHiddenInput
           type={type}
           {...register(name as Path<T>, { valueAsNumber: type === "number" })}
+          onChange={(e) => setFileName(e.target.files?.[0].name ?? null)}
           multiple
         />
       </Button>
       {error && (
         <Typography sx={{ color: "red" }}>{error.toString()}</Typography>
+      )}
+      {/* Display file name */}
+      {fileName && (
+        <Typography
+          sx={{
+            color: "#000",
+            fontFamily: "Roboto",
+            fontSize: { xs: "10px", sm: "12px", lg: "15px" },
+            fontStyle: "normal",
+            fontWeight: 400,
+            lineHeight: { xs: "9px", lg: "14px" },
+            letterSpacing: { xs: "0.3px", lg: "0.45px" },
+            mt: "10px",
+          }}
+        >
+          {fileName}
+        </Typography>
       )}
     </Box>
   );

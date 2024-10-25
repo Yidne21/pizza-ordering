@@ -63,7 +63,7 @@ const PizzaCard = (props: PizzaCardProps) => {
           pt: "20px",
           pl: "15px",
         }}
-        image="/images/wfullpizza.png"
+        image={props.pizza.image}
         alt={props.pizza.name}
       />
 
