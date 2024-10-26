@@ -4,7 +4,6 @@ import PizzaCard from "@/components/Home/card/pizza-card";
 import { Box, Typography } from "@mui/material";
 import { fetchOrderByCustomerId } from "@/lib/customerActions";
 
-
 async function OrderHistory() {
   const results = await fetchOrderByCustomerId();
 
@@ -12,10 +11,10 @@ async function OrderHistory() {
     return (
       <Box
         sx={{
-          display: 'flex',
-          justifyContent: 'center',
-          alignItems: 'center',
-          height: '100vh', // Full viewport height
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          height: "100vh", // Full viewport height
         }}
       >
         <Typography variant="h4" color="text.secondary">
@@ -31,7 +30,7 @@ async function OrderHistory() {
         sx={{
           display: "flex",
           flexWrap: "wrap",
-          justifyContent: "space-between", // Ensure equal spacing
+          justifyContent: "flex-start", // Ensure equal spacing
           gap: "25px", // Space between items
         }}
       >

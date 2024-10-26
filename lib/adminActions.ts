@@ -153,6 +153,7 @@ export async function updateOrderStatus({
     });
 
     revalidatePath("/dashboard/orders", "page");
+    revalidatePath("/orders", "page");
 
     return { success: true, message: "Order status updated successfully" };
   } catch (error) {

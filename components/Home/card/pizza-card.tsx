@@ -185,13 +185,14 @@ const PizzaCard = (props: PizzaCardProps) => {
               <Typography
                 sx={{
                   color:
-                    props.pizza.status === "Ordered" ? "#FFA500" : "#008000",
+                    props.pizza.status === "PREPARING" ? "#FFA500" : "#008000",
                   fontFamily: "Inter",
-                  fontSize: "32px",
+                  fontSize: "24px",
                   fontStyle: "normal",
-                  fontWeight: 700,
+                  fontWeight: 400,
                   lineHeight: "46px",
                   letterSpacing: "0.96px",
+                  textTransform: "capitalize",
                 }}
               >
                 {props.pizza.status}

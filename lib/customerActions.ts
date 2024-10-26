@@ -8,7 +8,6 @@ import { authOptions } from "@/auth";
 import { Actions, Subjects } from "@/utils/permissionSetting";
 import { revalidatePath } from "next/cache";
 
-
 export async function createOrder(formData: FormData) {
   const session = await getServerSession(authOptions);
   if (!session?.user) {
@@ -28,8 +27,6 @@ export async function createOrder(formData: FormData) {
     const toppingsString = formData.get("toppings") as string;
     const toppingsArray = JSON.parse(toppingsString);
 
-    console.log("Toppings array:", toppingsArray);
-
     // Create a new order and connect toppings
     const order = await prisma.order.create({
       data: {
@@ -45,7 +42,7 @@ export async function createOrder(formData: FormData) {
       },
     });
 
-    revalidatePath('/orders', 'page');
+    revalidatePath("/orders", "page");
     return { success: true, message: "Order placed successfully", order };
   } catch (error) {
     console.log("Error creating order:", error);
@@ -54,8 +51,6 @@ export async function createOrder(formData: FormData) {
 }
 
 export async function fetchOrderByCustomerId() {
-
-
   const session = await getServerSession(authOptions);
 
   const customerId = session?.user.id;
@@ -63,7 +58,6 @@ export async function fetchOrderByCustomerId() {
   if (!customerId) {
     return redirect("/login");
   }
-
 
   const userPermissions = session.user.role.permissions;
 
@@ -74,8 +68,6 @@ export async function fetchOrderByCustomerId() {
   if (!ability.can(Actions.read, Subjects.orderHistory)) {
     return redirect("/403");
   }
-
-
 
   try {
     // Fetch the orders by customer ID
@@ -110,7 +102,7 @@ export async function fetchOrderByCustomerId() {
       status: order.status,
     }));
 
-    return { sucess: true,  orders: formattedOrders };
+    return { sucess: true, orders: formattedOrders };
   } catch (error) {
     console.error("Error fetching orders:", error);
   }
@@ -122,9 +114,17 @@ export async function fetchPizzas(searchQuery = "") {
     const pizzas = await prisma.pizza.findMany({
       where: {
         OR: [
-          { name: { contains: searchQuery, mode: 'insensitive' } },
-          { PizzaTopping: { some: { topping: { name: { contains: searchQuery, mode: 'insensitive' } } } } }
-        ]
+          { name: { contains: searchQuery, mode: "insensitive" } },
+          {
+            PizzaTopping: {
+              some: {
+                topping: {
+                  name: { contains: searchQuery, mode: "insensitive" },
+                },
+              },
+            },
+          },
+        ],
       },
       include: {
         resturant: {
@@ -146,23 +146,22 @@ export async function fetchPizzas(searchQuery = "") {
     });
 
     // Map the data to match the format used in your component
-    const formattedPizzas = pizzas.map(pizza => ({
+    const formattedPizzas = pizzas.map((pizza) => ({
       id: pizza.id,
       name: pizza.name,
-      toppings: pizza.PizzaTopping.map(pt => pt.topping.name).join(", "), // Join all toppings into a string
+      toppings: pizza.PizzaTopping.map((pt) => pt.topping.name).join(", "), // Join all toppings into a string
       price: pizza.price,
       image: pizza.photoUrl,
       resturant: pizza.resturant.name,
       logo: pizza.resturant.logoUrl,
     }));
 
-    return { success: true, pizzas: formattedPizzas }
+    return { success: true, pizzas: formattedPizzas };
   } catch (error) {
     console.error("Error fetching pizzas:", error);
-    return  { success: true, pizzas: [] };
+    return { success: true, pizzas: [] };
   }
 }
-
 
 export async function getPizzaDetails(pizzaId: string) {
   try {
@@ -185,7 +184,7 @@ export async function getPizzaDetails(pizzaId: string) {
       pizzaId: pizza.id,
       name: pizza.name,
       price: pizza.price,
-      toppings: pizza.PizzaTopping.map(pt => ({
+      toppings: pizza.PizzaTopping.map((pt) => ({
         name: pt.topping.name,
         id: pt.topping.id,
       })),
