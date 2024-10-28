@@ -1,6 +1,6 @@
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/auth";
-import { createAbility } from "@/abilities/abilities";
+// import { createAbility } from "@/abilities/abilities";
 import { redirect } from "next/navigation";
 
 export default async function Dashboard() {
@@ -10,13 +10,13 @@ export default async function Dashboard() {
     redirect("/login");
   }
 
-  const { role } = session.user;
+  // const { role } = session.user;
 
-  const ability = createAbility(role.permissions);
+  // const ability = createAbility(role.permissions);
 
-  if (!ability.can("read", "Dashboard")) {
-    redirect("/403");
-  }
+  // if (!ability.can("read", "Dashboard")) {
+  //   redirect("/403");
+  // }
 
   return (
     <>
