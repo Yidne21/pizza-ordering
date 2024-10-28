@@ -7,6 +7,8 @@ import Visibility from "@mui/icons-material/Visibility";
 import Dropdown from "@/components/ui/Menu";
 import Done from "@mui/icons-material/Done";
 import OrderDetail from "./order-detail";
+import useAbilities from "@/hooks/useAbilities";
+import { Actions, Subjects } from "@/utils/permissionSetting";
 
 export type Order = {
   id: string;
@@ -95,10 +97,17 @@ const columns: MRT_ColumnDef<Order>[] = [
     header: "Status",
     Cell: ({ row }) => {
       const status = row.original.status;
+      const ability = useAbilities();
+
+      if (!ability.can(Actions.update, Subjects.order)) {
+        return null;
+      }
 
       return (
         <Box>
-          {status !== "DELIVERED" && <Dropdown status={status} orderId={row.original.id}/>}
+          {status !== "DELIVERED" && (
+            <Dropdown status={status} orderId={row.original.id} />
+          )}
           {status === "DELIVERED" && (
             <Box
               sx={{
