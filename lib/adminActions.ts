@@ -836,7 +836,7 @@ export async function getToppingsByResturantId() {
 
   const ability = createAbility(role.permissions);
 
-  if (!ability.can(Actions.read, Subjects.toppings) || !resturantId) {
+  if (!ability.can(Actions.create, Subjects.menu) || !resturantId) {
     redirect("/403");
   }
 

@@ -22,7 +22,6 @@ async function AddMenu() {
     redirect("/403");
   }
 
-
   return (
     <Box
       sx={{
@@ -32,8 +31,7 @@ async function AddMenu() {
         width: "100%",
       }}
     >
-      <AddMenuForm 
-      />
+      <AddMenuForm />
     </Box>
   );
 }

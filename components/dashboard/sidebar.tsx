@@ -19,6 +19,9 @@ import React from "react";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { signOut } from "next-auth/react";
+import { useSession } from "next-auth/react";
+import { redirect } from "next/navigation";
+import { createAbility } from "@/abilities/abilities";
 
 interface SidebarProps {
   isOpen: boolean;
@@ -27,12 +30,21 @@ interface SidebarProps {
 
 const Sidebar = ({ isOpen, setIsOpen }: SidebarProps) => {
   const pathname = usePathname();
+  const session = useSession();
 
   const handleLogout = async () => {
     signOut({
       callbackUrl: "/login",
     });
   };
+
+  const role = session.data?.user.role;
+
+  if (!role) {
+    redirect("/login");
+  }
+
+  const ability = createAbility(role.permissions);
 
   return (
     <Box
@@ -143,6 +155,10 @@ const Sidebar = ({ isOpen, setIsOpen }: SidebarProps) => {
         }}
       >
         {sideBarMenu.map((item, index) => {
+          if (!ability.can(item.action, item.subject)) {
+            return null;
+          }
+
           return (
             <ListItem
               component={Link}
