@@ -1,27 +1,8 @@
 "use server";
 
-import { prisma } from "./prisma";
-import { getServerSession } from "next-auth/next";
-import { createAbility } from "@/abilities/abilities";
-import { redirect } from "next/navigation";
-import { authOptions } from "@/auth";
-import { Actions, Subjects } from "@/utils/permissionSetting";
-import { revalidatePath } from "next/cache";
+import { prisma } from "./prisma.ts";
 
 export async function createOrder(formData: FormData) {
-  const session = await getServerSession(authOptions);
-  if (!session?.user) {
-    return redirect("/login");
-  }
-
-  const customerId = session.user.id;
-  const { role } = session.user;
-  const ability = createAbility(role.permissions);
-
-  if (!ability.can(Actions.create, Subjects.order) || !customerId) {
-    return redirect("/403");
-  }
-
   try {
     // Extract and parse toppings
     const toppingsString = formData.get("toppings") as string;
@@ -33,7 +14,7 @@ export async function createOrder(formData: FormData) {
         quantity: Number(formData.get("quantity")),
         pizzaId: formData.get("pizzaId") as string,
         total: Number(formData.get("total")),
-        customerId,
+        customerId: formData.get("customerId") as string,
         OrderTopping: {
           create: toppingsArray.map((toppingId: string) => ({
             topping: { connect: { id: toppingId } },
@@ -42,7 +23,6 @@ export async function createOrder(formData: FormData) {
       },
     });
 
-    revalidatePath("/orders", "page");
     return { success: true, message: "Order placed successfully", order };
   } catch (error) {
     console.log("Error creating order:", error);
@@ -50,29 +30,11 @@ export async function createOrder(formData: FormData) {
   }
 }
 
-export async function fetchOrderByCustomerId() {
-  const session = await getServerSession(authOptions);
-
-  const customerId = session?.user.id;
-
-  if (!customerId) {
-    return redirect("/login");
-  }
-
-  const userPermissions = session.user.role.permissions;
-
-  // Create ability instance based on user's permissions
-  const ability = createAbility(userPermissions);
-
-  // Redirect if user doesn't have permission to filter orders
-  if (!ability.can(Actions.read, Subjects.orderHistory)) {
-    return redirect("/403");
-  }
-
+export async function fetchOrderByCustomerId(customerId: string) {
   try {
     // Fetch the orders by customer ID
     const orders = await prisma.order.findMany({
-      where: { customerId: session.user.id },
+      where: { customerId },
       include: {
         pizza: {
           include: {
@@ -90,6 +52,10 @@ export async function fetchOrderByCustomerId() {
       },
     });
 
+    if (orders.length === 0) {
+      return { success: true, orders: [], message: "No order history yet" };
+    }
+
     // Transform the orders into the desired format
     const formattedOrders = orders.map((order) => ({
       id: order.id,
@@ -102,9 +68,10 @@ export async function fetchOrderByCustomerId() {
       status: order.status,
     }));
 
-    return { sucess: true, orders: formattedOrders };
+    return { success: true, orders: formattedOrders };
   } catch (error) {
     console.error("Error fetching orders:", error);
+    return { success: false, orders: [] };
   }
 }
 
@@ -156,10 +123,14 @@ export async function fetchPizzas(searchQuery = "") {
       logo: pizza.resturant.logoUrl,
     }));
 
+    if (formattedPizzas.length === 0) {
+      return { success: true, pizzas: [], message: "pizza not found" };
+    }
+
     return { success: true, pizzas: formattedPizzas };
   } catch (error) {
     console.error("Error fetching pizzas:", error);
-    return { success: true, pizzas: [] };
+    return { success: false, pizzas: [] };
   }
 }
 

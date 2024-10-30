@@ -21,6 +21,10 @@ import { orderSchema } from "@/utils/schema";
 import { orderFormTypes } from "@/utils/types";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { createOrder } from "@/lib/customerActions";
+import { useSession } from "next-auth/react";
+import { createAbility } from "../../../abilities/abilities";
+import { redirect } from "next/navigation";
+import { Actions, Subjects } from "@/utils/permissionSetting";
 
 // Keyframes for rolling animation
 const rollToActive = keyframes`
@@ -67,6 +71,24 @@ function OrderDetailCard({ pizzaDetail }: OrderDetail) {
   const [isSubmitting, setIsSubmitting] = useState(false); // Track submission state
   const [orderError, setOrderError] = useState<string | null>(null); // Track upload errors
 
+  const { control, handleSubmit, reset, formState } = useForm<orderFormTypes>({
+    resolver: zodResolver(orderSchema),
+  });
+
+  const session = useSession();
+
+  if (!session?.data?.user) {
+    return redirect("/login");
+  }
+
+  const customerId = session.data.user.id;
+  const { role } = session.data.user;
+  const ability = createAbility(role.permissions);
+
+  if (!ability.can(Actions.create, Subjects.order) || !customerId) {
+    return redirect("/403");
+  }
+
   const handleOpen = () => {
     setOpen(!open);
   };
@@ -74,10 +96,6 @@ function OrderDetailCard({ pizzaDetail }: OrderDetail) {
   const handleClose = () => {
     setOpen(!open);
   };
-
-  const { control, handleSubmit, reset, formState } = useForm<orderFormTypes>({
-    resolver: zodResolver(orderSchema),
-  });
 
   const handleOrder = async (data: orderFormTypes) => {
     setIsSubmitting(true);
@@ -89,6 +107,7 @@ function OrderDetailCard({ pizzaDetail }: OrderDetail) {
       formData.append("pizzaId", pizzaDetail.pizzaId);
       formData.append("total", totalPrice.toString());
       formData.append("quantity", Quantity.toString());
+      formData.append("customerId", customerId);
       const response = await createOrder(formData); // Call the server action
 
       if (response.success) {
