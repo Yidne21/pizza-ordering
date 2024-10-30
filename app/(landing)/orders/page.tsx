@@ -17,12 +17,12 @@ async function OrderHistory() {
   }
 
   const customerId = session.user.id;
-  const { role } = session.user;
-  const ability = createAbility(role.permissions);
+  // const { role } = session.user;
+  // const ability = createAbility(role.permissions);
 
-  if (!ability.can(Actions.read, Subjects.orderHistory) || !customerId) {
-    return redirect("/403");
-  }
+  // if (!ability.can(Actions.read, Subjects.orderHistory) || !customerId) {
+  //   return redirect("/403");
+  // }
 
   const results = await fetchOrderByCustomerId(customerId);
 
