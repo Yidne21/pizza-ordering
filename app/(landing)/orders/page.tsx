@@ -3,9 +3,9 @@ import PizzaSection from "@/components/Home/pizza-section";
 import PizzaCard from "@/components/Home/card/pizza-card";
 import { Box, Typography } from "@mui/material";
 import { fetchOrderByCustomerId } from "@/lib/customerActions";
-import { createAbility } from "../../../abilities/abilities";
+// import { createAbility } from "../../../abilities/abilities";
 import { redirect } from "next/navigation";
-import { Actions, Subjects } from "@/utils/permissionSetting";
+// import { Actions, Subjects } from "@/utils/permissionSetting";
 import { authOptions } from "@/auth";
 import { getServerSession } from "next-auth";
 
@@ -17,12 +17,12 @@ async function OrderHistory() {
   }
 
   const customerId = session.user.id;
-  const { role } = session.user;
-  const ability = createAbility(role.permissions);
+  // const { role } = session.user;
+  // const ability = createAbility(role.permissions);
 
-  if (!ability.can(Actions.read, Subjects.orderHistory) || !customerId) {
-    return redirect("/403");
-  }
+  // if (!ability.can(Actions.read, Subjects.orderHistory) || !customerId) {
+  //   return redirect("/403");
+  // }
 
   const results = await fetchOrderByCustomerId(customerId);
 
