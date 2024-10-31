@@ -10,12 +10,15 @@ import {
 import { Box, Button, Typography } from "@mui/material";
 import AddRolePopUp from "@/app/dashboard/roles/add-role-popup";
 import AddUserPopUp from "@/app/dashboard/users/add-user-popup";
+import { useSession } from "next-auth/react";
+import { Actions, Subjects } from "@/utils/permissionSetting";
+import useAbility from "@/hooks/useAbilities";
 
 type CustomeTableProps<T extends MRT_RowData> = {
   data: T[];
-  columns: MRT_ColumnDef<T>[]; 
-  maxHeight: string; 
-  title: string; 
+  columns: MRT_ColumnDef<T>[];
+  maxHeight: string;
+  title: string;
   fetchData: (params: {
     filters: MRT_ColumnFiltersState;
     globalFilter: string;
@@ -29,6 +32,10 @@ const CustomeTable = <T extends MRT_RowData>({
   fetchData,
   title,
 }: CustomeTableProps<T>) => {
+  const { data: session } = useSession();
+  const ability = useAbility();
+  const resturantId = session?.user.resturantId;
+
   // State for column filters and global filter
   const [columnFilters, setColumnFilters] = useState<MRT_ColumnFiltersState>(
     []
@@ -96,6 +103,12 @@ const CustomeTable = <T extends MRT_RowData>({
     enableColumnFilters: true,
     enablePagination: false,
     renderTopToolbarCustomActions: () => {
+      if (!resturantId) {
+        return null;
+      }
+
+      const canIAddUser = ability?.can(Actions.create, Subjects.user) ?? false;
+      const canIAddRole = ability?.can(Actions.create, Subjects.role) ?? false;
       return (
         <Box>
           {title === "orders" && (
@@ -114,7 +127,7 @@ const CustomeTable = <T extends MRT_RowData>({
             </Typography>
           )}
 
-          {title === "users" && (
+          {title === "users" && canIAddUser && (
             <>
               <Button
                 variant="contained"
@@ -136,11 +149,15 @@ const CustomeTable = <T extends MRT_RowData>({
               >
                 Add users
               </Button>
-              <AddUserPopUp open={open} onClose={handleModalClose} />
+              <AddUserPopUp
+                open={open}
+                onClose={handleModalClose}
+                resturantId={resturantId}
+              />
             </>
           )}
 
-          {title === "roles" && (
+          {title === "roles" && canIAddRole && (
             <Box>
               <Button
                 variant="contained"

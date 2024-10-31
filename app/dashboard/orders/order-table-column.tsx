@@ -99,7 +99,7 @@ const columns: MRT_ColumnDef<Order>[] = [
       const status = row.original.status;
       const ability = useAbilities();
 
-      if (!ability.can(Actions.update, Subjects.order)) {
+      if (ability && !ability.can(Actions.update, Subjects.order)) {
         return null;
       }
 

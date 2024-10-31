@@ -8,14 +8,16 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import UpdateRolePopUp from "./update-role-popup";
 import { updateRoleStatus, deleteRole } from "@/lib/adminActions";
 import { toast } from "react-toastify";
-
+import { useSession } from "next-auth/react";
+import useAbility from "@/hooks/useAbilities";
+import { Actions, Subjects } from "@/utils/permissionSetting";
 
 type Permission = {
   id: string;
   roleId: string;
   action: string;
   subject: string;
-}
+};
 
 export type Role = {
   id: string;
@@ -40,26 +42,41 @@ const columns: MRT_ColumnDef<Role>[] = [
     header: "Actions",
     Cell: ({ row }) => {
       //update role status
-      const [checked, setChecked] = useState(
-        row.original.status === "ACTIVE"
-      );
-      const status = row.original.status === "ACTIVE" ? "Active": "Inactive"; 
+      const [checked, setChecked] = useState(row.original.status === "ACTIVE");
+      const status = row.original.status === "ACTIVE" ? "Active" : "Inactive";
+      const { data: session } = useSession();
+      const [open, setOpen] = useState(false);
+      const ability = useAbility();
+
+      const canUpdateRole =
+        ability?.can(Actions.update, Subjects.role) ?? false;
+      const canDeleteRole =
+        ability?.can(Actions.delete, Subjects.role) ?? false;
+
+      if (!session?.user?.resturantId) {
+        return null;
+      }
+
+      const resturantId = session?.user?.resturantId;
 
       const handleSwitchChange = async (
         event: React.ChangeEvent<HTMLInputElement>
       ) => {
         const newChecked = event.target.checked;
         setChecked(newChecked);
-        const newNewStatus = row.original.status === "ACTIVE" ? "INACTIVE" : "ACTIVE";
-       const result = await updateRoleStatus({status: newNewStatus, roleId: row.original.id});
-       if (result.success){
-        toast.success(result.message);
-       }
-
+        const newNewStatus =
+          row.original.status === "ACTIVE" ? "INACTIVE" : "ACTIVE";
+        const result = await updateRoleStatus({
+          status: newNewStatus,
+          roleId: row.original.id,
+          resturantId,
+        });
+        if (result.success) {
+          toast.success(result.message);
+        }
       };
 
       // update role
-      const [open, setOpen] = useState(false);
       const handleModalClose = () => {
         setOpen(!open);
       };
@@ -76,15 +93,17 @@ const columns: MRT_ColumnDef<Role>[] = [
 
       // delete role
 
-      const handleDelete = async ()=> {
-        const result = await deleteRole({roleId: row.original.id});
-        if(result.success){
+      const handleDelete = async () => {
+        const result = await deleteRole({
+          roleId: row.original.id,
+          resturantId,
+        });
+        if (result.success) {
           toast.success(result.message);
-        }else {
-          toast.error(result.message)
+        } else {
+          toast.error(result.message);
         }
-      }
-
+      };
 
       return (
         <Box
@@ -94,15 +113,15 @@ const columns: MRT_ColumnDef<Role>[] = [
             gap: "10px",
           }}
         >
-
           {/* status switch */}
           <Box
             sx={{
-              backgroundColor: status === 'Active' ? "rgba(0, 128, 0, 0.10)" : "#ffbaba",
+              backgroundColor:
+                status === "Active" ? "rgba(0, 128, 0, 0.10)" : "#ffbaba",
               borderRadius: "10px",
               display: "flex",
               alignItems: "center",
-              color: status === 'Active' ? "#14a514" : "#ff0000",
+              color: status === "Active" ? "#14a514" : "#ff0000",
               justifyContent: "center",
               width: "102px",
             }}
@@ -111,64 +130,68 @@ const columns: MRT_ColumnDef<Role>[] = [
             <Switch
               {...label}
               size="small"
-              color={status === "Active" ? "success": "error"}
+              color={status === "Active" ? "success" : "error"}
               checked={checked}
               onChange={handleSwitchChange}
             />
           </Box>
 
           {/* eye icon */}
-          <Box
-            sx={{
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              p: "5px",
-              borderRadius: "100%",
-              backgroundColor: "#FFF",
-              "&:hover": {
-                background: "#d9e2e9",
-              },
-            }}
-          >
-            <VisibilityIcon
+          {canUpdateRole && (
+            <Box
               sx={{
-                width: "24px",
-                height: "24px",
-                cursor: "pointer",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                p: "5px",
+                borderRadius: "100%",
+                backgroundColor: "#FFF",
+                "&:hover": {
+                  background: "#d9e2e9",
+                },
               }}
-              onClick={handleModalOpen}
-            />
-            <UpdateRolePopUp
-              open={open}
-              onClose={handleModalClose}
-              role={role}
-            />
-          </Box>
+            >
+              <VisibilityIcon
+                sx={{
+                  width: "24px",
+                  height: "24px",
+                  cursor: "pointer",
+                }}
+                onClick={handleModalOpen}
+              />
+              <UpdateRolePopUp
+                open={open}
+                onClose={handleModalClose}
+                role={role}
+              />
+            </Box>
+          )}
 
           {/* delete icon */}
-          <Box
-            sx={{
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              p: "5px",
-              borderRadius: "100%",
-              backgroundColor: "#FFF",
-              "&:hover": {
-                background: "#d9e2e9",
-              },
-            }}
-          >
-            <DeleteIcon
+          {canDeleteRole && (
+            <Box
               sx={{
-                width: "24px",
-                height: "24px",
-                cursor: "pointer",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                p: "5px",
+                borderRadius: "100%",
+                backgroundColor: "#FFF",
+                "&:hover": {
+                  background: "#d9e2e9",
+                },
               }}
-              onClick={handleDelete}
-            />
-          </Box>
+            >
+              <DeleteIcon
+                sx={{
+                  width: "24px",
+                  height: "24px",
+                  cursor: "pointer",
+                }}
+                onClick={handleDelete}
+              />
+            </Box>
+          )}
         </Box>
       );
     },

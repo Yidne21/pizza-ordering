@@ -9,7 +9,8 @@ import { MRT_ColumnFiltersState } from "material-react-table";
 
 type RoleTableProps = {
   initialRoles: Role[];
-}
+  resturantId: string;
+};
 
 function RoleTable(props: RoleTableProps) {
   const [data, setData] = useState<Role[]>(props.initialRoles);
@@ -38,10 +39,10 @@ function RoleTable(props: RoleTableProps) {
         ...formattedFilters,
         global: params.globalFilter,
       };
-      const result = await filterRoles(filters);
+      const result = await filterRoles(filters, props.resturantId);
       setData(result.roles);
     },
-    [ props.initialRoles]
+    [props.resturantId]
   );
 
   return (

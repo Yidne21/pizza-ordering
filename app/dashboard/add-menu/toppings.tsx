@@ -16,11 +16,13 @@ interface ToppingComponentProps {
   control: Control<addMenuFormTypes>;
   selectedToppings: string[];
   setSelectedToppings: (toppings: string[]) => void;
+  resturantId: string;
 }
 
 const ToppingComponent: React.FC<ToppingComponentProps> = ({
   control,
   setSelectedToppings,
+  resturantId,
 }) => {
   const [toppings, setToppings] = useState<string[]>([]);
   const [newTopping, setNewTopping] = useState<string>("");
@@ -30,7 +32,7 @@ const ToppingComponent: React.FC<ToppingComponentProps> = ({
   const getToppings = useCallback(async () => {
     setIsLoading(true);
     try {
-      const result = await getToppingsByResturantId();
+      const result = await getToppingsByResturantId(resturantId);
       if (result.success) {
         setToppings(
           result.toppings.map((topping: { name: string }) => topping.name)
@@ -43,7 +45,7 @@ const ToppingComponent: React.FC<ToppingComponentProps> = ({
     } finally {
       setIsLoading(false);
     }
-  }, []);
+  }, [resturantId]);
 
   useEffect(() => {
     getToppings();

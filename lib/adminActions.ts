@@ -8,39 +8,22 @@ import { imageUploader } from "./fileUpload";
 import { PermissionType, RoleType, UserType } from "@prisma/client";
 import { revalidatePath } from "next/cache";
 import bcrypt from "bcrypt";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/auth";
-import { createAbility } from "@/abilities/abilities";
-import { redirect } from "next/navigation";
-import { Subjects, Actions } from "@/utils/permissionSetting";
 
 // orders
-export async function filterOrders({
-  status,
-  customerPhone,
-  pizzaName,
-  global,
-}: {
-  status?: string;
-  customerPhone?: string;
-  pizzaName?: string;
-  global?: string;
-}) {
-  const session = await getServerSession(authOptions);
-
-  if (!session) {
-    redirect("/login");
-  }
-  const resturantId = session.user.resturantId;
-
-  const { role } = session.user;
-
-  const ability = createAbility(role.permissions);
-
-  if (!ability.can(Actions.read, Subjects.orders) || !resturantId) {
-    redirect("/403");
-  }
-
+export async function filterOrders(
+  {
+    status,
+    customerPhone,
+    pizzaName,
+    global,
+  }: {
+    status?: string;
+    customerPhone?: string;
+    pizzaName?: string;
+    global?: string;
+  },
+  resturantId: string
+) {
   const where: Prisma.OrderWhereInput = {
     pizza: {
       resturantId: resturantId, // Filter orders by the restaurant ID
@@ -124,19 +107,6 @@ export async function updateOrderStatus({
   orderId: string;
   status: string;
 }) {
-  const session = await getServerSession(authOptions);
-
-  if (!session) {
-    redirect("/login");
-  }
-  const { role } = session.user;
-
-  const ability = createAbility(role.permissions);
-
-  if (!ability.can(Actions.update, Subjects.orderStatus)) {
-    redirect("/403");
-  }
-
   const newStatus =
     status === "DELIVERED"
       ? OrderStatus.DELIVERED
@@ -144,16 +114,14 @@ export async function updateOrderStatus({
       ? OrderStatus.PREPARING
       : OrderStatus.READY;
 
-  console.log(newStatus);
   try {
     // Update the order status
-    await prisma.order.update({
+    const res = await prisma.order.update({
       where: { id: orderId },
       data: { status: newStatus },
     });
 
-    revalidatePath("/dashboard/orders", "page");
-    revalidatePath("/orders", "page");
+    console.log(res);
 
     return { success: true, message: "Order status updated successfully" };
   } catch (error) {
@@ -165,25 +133,11 @@ export async function updateOrderStatus({
 // menu
 export async function addMenu(formData: FormData) {
   try {
-    const session = await getServerSession(authOptions);
-
-    if (!session) {
-      redirect("/login");
-    }
-    const resturantId = session.user.resturantId;
-
-    const { role } = session.user;
-
-    const ability = createAbility(role.permissions);
-
-    if (!ability.can(Actions.create, Subjects.menu) || !resturantId) {
-      redirect("/403");
-    }
-
     const name = formData.get("name") as string;
     const price = parseFloat(formData.get("price") as string);
     const toppings = formData.get("toppings") as string;
     const imageFile = formData.get("image") as File;
+    const resturantId = formData.get("resturantId") as string;
 
     // Upload the image and get the URL
     const imageUrl = await imageUploader(imageFile, "pizza/images");
@@ -250,31 +204,19 @@ export async function addMenu(formData: FormData) {
   }
 }
 
-export async function filterRoles({
-  name,
-  status,
-  global,
-}: {
-  name?: string;
-  status?: RoleStatus;
-  global?: string;
-}) {
+export async function filterRoles(
+  {
+    name,
+    status,
+    global,
+  }: {
+    name?: string;
+    status?: RoleStatus;
+    global?: string;
+  },
+  resturantId: string
+) {
   try {
-    const session = await getServerSession(authOptions);
-
-    if (!session) {
-      redirect("/login");
-    }
-    const resturantId = session.user.resturantId;
-
-    const { role } = session.user;
-
-    const ability = createAbility(role.permissions);
-
-    if (!ability.can(Actions.read, Subjects.roles) || !resturantId) {
-      redirect("/403");
-    }
-
     // Prepare the filters
     const whereFilters: Prisma.RoleWhereInput = {
       resturantId: resturantId,
@@ -336,21 +278,7 @@ export async function addRole(formData: FormData) {
   const name = formData.get("name") as string;
   const permissions = formData.get("permissions") as string;
   const parsedPermissions: string[] = JSON.parse(permissions);
-
-  const session = await getServerSession(authOptions);
-
-  if (!session) {
-    redirect("/login");
-  }
-  const resturantId = session.user.resturantId;
-
-  const { role } = session.user;
-
-  const ability = createAbility(role.permissions);
-
-  if (!ability.can(Actions.create, Subjects.role) || !resturantId) {
-    redirect("/403");
-  }
+  const resturantId = formData.get("resturantId") as string;
 
   try {
     // Create the new role
@@ -388,21 +316,7 @@ export async function updateRole(formData: FormData) {
   const permissions = formData.get("permissions") as string;
   const roleId = formData.get("roleId") as string;
   const parsedPermissions: string[] = JSON.parse(permissions);
-
-  const session = await getServerSession(authOptions);
-
-  if (!session) {
-    redirect("/login");
-  }
-  const resturantId = session.user.resturantId;
-
-  const { role } = session.user;
-
-  const ability = createAbility(role.permissions);
-
-  if (!ability.can(Actions.update, Subjects.role) || !resturantId) {
-    redirect("/403");
-  }
+  const resturantId = formData.get("resturantId") as string;
 
   try {
     // Step 1: Update the role's name and restaurant if provided
@@ -469,34 +383,28 @@ export async function updateRole(formData: FormData) {
 export async function updateRoleStatus({
   status,
   roleId,
+  resturantId,
 }: {
   status: string;
   roleId: string;
+  resturantId: string;
 }) {
   try {
-    const session = await getServerSession(authOptions);
-
-    if (!session) {
-      redirect("/login");
-    }
-    const { role } = session.user;
-
-    const ability = createAbility(role.permissions);
-
-    if (!ability.can(Actions.update, Subjects.role)) {
-      redirect("/403");
-    }
-
     const roleStatus =
       status === "ACTIVE" ? RoleStatus.ACTIVE : RoleStatus.INACTIVE;
-    await prisma.role.update({
+    const res = await prisma.role.update({
       where: {
         id: roleId,
+        resturantId,
       },
       data: {
         status: roleStatus,
       },
     });
+
+    if (!res) {
+      return { success: false, message: "Role not found" };
+    }
 
     revalidatePath("/dashboard/orders", "page");
     return { success: true, message: "role status updated successfully" };
@@ -506,24 +414,18 @@ export async function updateRoleStatus({
   }
 }
 
-export async function deleteRole({ roleId }: { roleId: string }) {
-  const session = await getServerSession(authOptions);
-
-  if (!session) {
-    redirect("/login");
-  }
-  const { role } = session.user;
-
-  const ability = createAbility(role.permissions);
-
-  if (!ability.can(Actions.delete, Subjects.role)) {
-    redirect("/403");
-  }
-
+export async function deleteRole({
+  roleId,
+  resturantId,
+}: {
+  roleId: string;
+  resturantId: string;
+}) {
   try {
     await prisma.role.delete({
       where: {
         id: roleId,
+        resturantId,
       },
     });
     revalidatePath("/dashboard/orders", "page");
@@ -572,21 +474,7 @@ export async function getResturantPermission() {
   }
 }
 
-export async function getResturantRoles() {
-  const session = await getServerSession(authOptions);
-
-  if (!session) {
-    redirect("/login");
-  }
-  const resturantId = session.user.resturantId;
-
-  const { role } = session.user;
-
-  const ability = createAbility(role.permissions);
-
-  if (!ability.can(Actions.read, Subjects.roles) || !resturantId) {
-    redirect("/403");
-  }
+export async function getResturantRoles(resturantId: string) {
   try {
     const roles = await prisma.role.findMany({
       where: {
@@ -606,33 +494,21 @@ export async function getResturantRoles() {
 }
 
 // users
-export async function filterUsers({
-  name,
-  email,
-  phone,
-  global,
-}: {
-  name?: string;
-  email?: string;
-  phone?: string;
-  global?: string;
-}) {
+export async function filterUsers(
+  {
+    name,
+    email,
+    phone,
+    global,
+  }: {
+    name?: string;
+    email?: string;
+    phone?: string;
+    global?: string;
+  },
+  resturantId: string
+) {
   try {
-    const session = await getServerSession(authOptions);
-
-    if (!session) {
-      redirect("/login");
-    }
-    const resturantId = session.user.resturantId;
-
-    const { role } = session.user;
-
-    const ability = createAbility(role.permissions);
-
-    if (!ability.can(Actions.read, Subjects.users) || !resturantId) {
-      redirect("/403");
-    }
-
     const whereFilters: Prisma.UserWhereInput = {
       resturantId: resturantId,
       type: UserType.RESTURANT,
@@ -672,27 +548,13 @@ export async function filterUsers({
 }
 
 export async function addUser(formData: FormData) {
-  const session = await getServerSession(authOptions);
-
-  if (!session) {
-    redirect("/login");
-  }
-  const resturantId = session.user.resturantId;
-
-  const { role } = session.user;
-
-  const ability = createAbility(role.permissions);
-
-  if (!ability.can(Actions.create, Subjects.user) || !resturantId) {
-    redirect("/403");
-  }
-
   try {
     const name = formData.get("name") as string;
     const email = formData.get("email") as string;
     const location = formData.get("location") as string;
     const phone = formData.get("phoneNumber") as string;
     const role = formData.get("role") as string;
+    const resturantId = formData.get("resturantId") as string;
 
     const hashedPassword = await bcrypt.hash(
       formData.get("password") as string,
@@ -723,29 +585,19 @@ export async function addUser(formData: FormData) {
 export async function updateUserStatus({
   status,
   userId,
+  resturantId,
 }: {
   status: string;
   userId: string;
+  resturantId: string;
 }) {
   try {
-    const session = await getServerSession(authOptions);
-
-    if (!session) {
-      redirect("/login");
-    }
-    const { role } = session.user;
-
-    const ability = createAbility(role.permissions);
-
-    if (!ability.can(Actions.update, Subjects.user)) {
-      redirect("/403");
-    }
-
     const userStatus =
       status === "ACTIVE" ? UserStatus.ACTIVE : UserStatus.INACTIVE;
     await prisma.user.update({
       where: {
         id: userId,
+        resturantId,
       },
       data: {
         status: userStatus,
@@ -760,24 +612,18 @@ export async function updateUserStatus({
   }
 }
 
-export async function deleteUser({ userId }: { userId: string }) {
-  const session = await getServerSession(authOptions);
-
-  if (!session) {
-    redirect("/login");
-  }
-  const { role } = session.user;
-
-  const ability = createAbility(role.permissions);
-
-  if (!ability.can(Actions.delete, Subjects.user)) {
-    redirect("/403");
-  }
-
+export async function deleteUser({
+  userId,
+  resturantId,
+}: {
+  userId: string;
+  resturantId: string;
+}) {
   try {
     await prisma.user.delete({
       where: {
         id: userId,
+        resturantId,
       },
     });
     revalidatePath("/dashboard/users", "page");
@@ -824,22 +670,7 @@ export async function getToppingsByPizzaId(pizzaId: string) {
   }
 }
 
-export async function getToppingsByResturantId() {
-  const session = await getServerSession(authOptions);
-
-  if (!session) {
-    redirect("/login");
-  }
-  const resturantId = session.user.resturantId;
-
-  const { role } = session.user;
-
-  const ability = createAbility(role.permissions);
-
-  if (!ability.can(Actions.create, Subjects.menu) || !resturantId) {
-    redirect("/403");
-  }
-
+export async function getToppingsByResturantId(resturantId: string) {
   try {
     const toppings = await prisma.topping.findMany({
       where: {

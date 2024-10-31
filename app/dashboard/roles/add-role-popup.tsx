@@ -1,10 +1,9 @@
-'use client'
+"use client";
 import { useEffect, useState, useCallback, useMemo } from "react";
-import { Box, Typography } from "@mui/material";  // Material UI components
+import { Box, Typography } from "@mui/material"; // Material UI components
 import CustomModal from "@/components/ui/Modal";
 import AddForm from "./add-form";
 import { getResturantPermission } from "@/lib/adminActions";
-
 
 type Permission = {
   id: string;
@@ -21,8 +20,6 @@ function AddRolePopUp({ open, onClose }: AddRolePopUpProps) {
   const [permissions, setPermissions] = useState<Permission[]>([]);
   const [error, setError] = useState<string | undefined>(undefined);
   const [loading, setIsLoading] = useState(false);
-
-
 
   const getPermissions = useCallback(async () => {
     setIsLoading(true);
@@ -46,18 +43,16 @@ function AddRolePopUp({ open, onClose }: AddRolePopUpProps) {
     }
   }, [open, getPermissions]);
 
-  const role = useMemo(() => ({
-    name: "",
-    permissions,
-  }), [permissions]);
+  const role = useMemo(
+    () => ({
+      name: "",
+      permissions,
+    }),
+    [permissions]
+  );
 
   return (
-    <CustomModal
-      open={open}
-      onClose={onClose}
-      width="40%"
-      height="100%"
-    >
+    <CustomModal open={open} onClose={onClose} width="40%" height="100%">
       {loading ? (
         <Box
           display="flex"

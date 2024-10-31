@@ -1,7 +1,6 @@
 import NextAuth from "next-auth";
 import { prisma } from "@/lib/prisma";
 import bcrypt from "bcrypt";
-import { z } from "zod";
 import Credentials from "next-auth/providers/credentials";
 import { NextAuthOptions } from "next-auth";
 
@@ -29,17 +28,10 @@ export const authOptions: NextAuthOptions = {
         password: { label: "Password", type: "password" },
       },
       async authorize(credentials): Promise<User | null> {
-        // Validate the input format
-        const parsedCredentials = z
-          .object({ email: z.string().email(), password: z.string().min(6) })
-          .safeParse(credentials);
-
-        if (!parsedCredentials.success) {
-          // If validation fails, return a custom error message
-          throw new Error("Invalid email or password format.");
+        if (!credentials) {
+          throw new Error("Credentials not provided.");
         }
-
-        const { email, password } = parsedCredentials.data;
+        const { email, password } = credentials;
 
         // Find user by email
         const user = await prisma.user.findUnique({
@@ -112,7 +104,7 @@ export const authOptions: NextAuthOptions = {
 
       session.user = {
         ...session.user,
-        id: token.id.toString(), 
+        id: token.id.toString(),
         email: token.email ?? "",
         resturantId: token.resturantId as string,
         role: token.role as {

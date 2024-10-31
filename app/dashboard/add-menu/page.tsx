@@ -10,15 +10,11 @@ import { Subjects, Actions } from "@/utils/permissionSetting";
 async function AddMenu() {
   const session = await getServerSession(authOptions);
 
-  if (!session) {
-    redirect("/login");
-  }
+  const { role, resturantId } = session?.user || {};
 
-  const { role } = session.user;
+  const ability = role ? createAbility(role.permissions) : null;
 
-  const ability = createAbility(role.permissions);
-
-  if (!ability.can(Actions.create, Subjects.menu)) {
+  if (!ability || !ability.can(Actions.create, Subjects.menu) || !resturantId) {
     redirect("/403");
   }
 
@@ -31,7 +27,7 @@ async function AddMenu() {
         width: "100%",
       }}
     >
-      <AddMenuForm />
+      <AddMenuForm resturantId={resturantId} />
     </Box>
   );
 }

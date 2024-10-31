@@ -21,12 +21,13 @@ import { toast } from "react-toastify";
 type role = {
   id: string;
   name: string;
-}
+};
 
 type FormProps = {
-  roles: role[]
+  roles: role[];
   isEdit: boolean;
   onClose: () => void;
+  resturantId: string;
 };
 
 function Form(props: FormProps) {
@@ -52,6 +53,7 @@ function Form(props: FormProps) {
       formData.append("phoneNumber", data.phoneNumber);
       formData.append("password", data.password);
       formData.append("role", data.role);
+      formData.append("resturantId", props.resturantId);
 
       const response = await addUser(formData);
 
@@ -62,7 +64,7 @@ function Form(props: FormProps) {
         props.onClose();
       } else {
         setIsSubmitting(false);
-        toast.error(response.message)
+        toast.error(response.message);
       }
     } catch (error) {
       console.log(error);
@@ -127,18 +129,18 @@ function Form(props: FormProps) {
         }}
       >
         <FormControl>
-        <InputLabel
-        sx={{
-          color: '#000',
-          fontWeight: 400,
-          fontSize: '12px',
-          "&.Mui-focused": {
-            color: '#000',
-          }
-        }}
-      >
-        Select Role
-      </InputLabel>
+          <InputLabel
+            sx={{
+              color: "#000",
+              fontWeight: 400,
+              fontSize: "12px",
+              "&.Mui-focused": {
+                color: "#000",
+              },
+            }}
+          >
+            Select Role
+          </InputLabel>
 
           <Controller
             name="role"
@@ -161,7 +163,6 @@ function Form(props: FormProps) {
                 }}
               >
                 {props.roles.map((role) => (
-                  
                   <MenuItem key={role.id} value={role.id}>
                     <ListItemText
                       primary={role.name}

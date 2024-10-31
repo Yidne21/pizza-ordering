@@ -2,11 +2,7 @@
 "use client";
 
 import React, { useState } from "react";
-import {
-  Typography,
-  Box,
-  Button,
-} from "@mui/material";
+import { Typography, Box, Button } from "@mui/material";
 import InputFileUpload from "@/components/ui/input-file-upload";
 import SuccessPopUp from "@/components/ui/success-popup";
 import { useForm } from "react-hook-form";
@@ -18,14 +14,16 @@ import { addMenu } from "@/lib/adminActions";
 import ToppingComponent from "./toppings";
 import { toast } from "react-toastify";
 
-function AddMenuForm() {
+interface AddMenuFormProps {
+  resturantId: string;
+}
+
+function AddMenuForm({ resturantId }: AddMenuFormProps) {
   const [open, setOpen] = useState(false);
-  const [isSubmitting, setIsSubmitting] = useState(false); 
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [uploadError, setUploadError] = useState<string | null>(null);
   const handleClose = () => setOpen(!open);
   const [selectedToppings, setSelectedToppings] = useState<string[]>([]);
-
- 
 
   const {
     register,
@@ -39,20 +37,21 @@ function AddMenuForm() {
 
   // Handle form submission
   const handleFormSubmit = async (data: addMenuFormTypes) => {
-    setIsSubmitting(true); 
-    setUploadError(null); 
+    setIsSubmitting(true);
+    setUploadError(null);
 
     try {
       const formData = new FormData();
       formData.append("name", data.name);
       formData.append("price", data.price.toString());
-      formData.append("image", data.logo[0]); 
+      formData.append("image", data.logo[0]);
       formData.append("toppings", JSON.stringify(data.toppings));
+      formData.append("resturantId", resturantId);
       const response = await addMenu(formData);
 
       if (response.success) {
-        setOpen(true); 
-        reset(); 
+        setOpen(true);
+        reset();
       } else {
         setUploadError(response.message);
         toast.error(uploadError);
@@ -139,11 +138,12 @@ function AddMenuForm() {
             >
               Toppings
             </Typography>
-            <ToppingComponent 
-            control={control}
-            selectedToppings={selectedToppings}
-            setSelectedToppings={setSelectedToppings}
-            />              
+            <ToppingComponent
+              control={control}
+              selectedToppings={selectedToppings}
+              setSelectedToppings={setSelectedToppings}
+              resturantId={resturantId}
+            />
           </Box>
 
           {/* Input Field for Price */}

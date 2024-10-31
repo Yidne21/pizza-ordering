@@ -12,8 +12,11 @@ type Filters = {
   [key: string]: string | number | null | undefined;
 };
 
-async function fetchUsers( filters: Filters): Promise<User[]> {
-  const result = await filterUsers(filters);
+async function fetchUsers(
+  filters: Filters,
+  resturantId: string
+): Promise<User[]> {
+  const result = await filterUsers(filters, resturantId);
   return result.users;
 }
 
@@ -24,20 +27,19 @@ async function Users() {
     redirect("/login");
   }
 
-  const { role } = session.user;
+  const { role, resturantId } = session.user;
 
   const ability = createAbility(role.permissions);
 
-  if (!ability.can(Actions.read, Subjects.users)) {
+  if (!ability.can(Actions.read, Subjects.users) || !resturantId) {
     redirect("/403");
   }
 
-
-  const users = await fetchUsers({});
+  const users = await fetchUsers({}, resturantId);
 
   return (
     <>
-      <UserTable initialUsers={users}/>
+      <UserTable initialUsers={users} resturantId={resturantId} />
     </>
   );
 }

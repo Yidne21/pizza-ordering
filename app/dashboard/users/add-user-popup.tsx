@@ -5,42 +5,37 @@ import { getResturantRoles } from "@/lib/adminActions";
 import { Typography } from "@mui/material";
 import { Box } from "@mui/system";
 
-
-
 type role = {
   id: string;
   name: string;
-}
-
+};
 
 export type AddUserPopUpProps = {
   open: boolean;
   onClose: () => void;
+  resturantId: string;
 };
 
 function AddUserPopUp(props: AddUserPopUpProps) {
-
   const [roles, setRoles] = useState<role[]>([]);
   const [error, setError] = useState<string | undefined>(undefined);
   const [loading, setIsLoading] = useState(false);
 
-
-
   const getroles = useCallback(async () => {
     setIsLoading(true);
     try {
-      const result = await getResturantRoles();
+      const result = await getResturantRoles(props.resturantId);
       if (result.success) {
         setRoles(result.roles);
       } else {
         setError(result.message);
       }
-    } catch{
+    } catch {
       setError("Failed to fetch roles");
     } finally {
       setIsLoading(false);
     }
-  }, []);
+  }, [props.resturantId]);
 
   useEffect(() => {
     if (props.open) {
@@ -48,11 +43,13 @@ function AddUserPopUp(props: AddUserPopUpProps) {
     }
   }, [props.open, getroles]);
 
-
   // prevents unncessary re-render
-  const resturantRoles = useMemo(() => ({
-    roles,
-  }), [roles]);
+  const resturantRoles = useMemo(
+    () => ({
+      roles,
+    }),
+    [roles]
+  );
 
   return (
     <CustomModal
@@ -86,7 +83,12 @@ function AddUserPopUp(props: AddUserPopUpProps) {
           </Typography>
         </Box>
       ) : (
-        <Form roles={resturantRoles.roles} isEdit={false} onClose={props.onClose} />
+        <Form
+          roles={resturantRoles.roles}
+          isEdit={false}
+          onClose={props.onClose}
+          resturantId={props.resturantId}
+        />
       )}
     </CustomModal>
   );

@@ -13,8 +13,11 @@ type Filters = {
   [key: string]: string | number | null | undefined;
 };
 
-async function fetchOrders(filters: Filters): Promise<Order[]> {
-  const result = await filterOrders(filters);
+async function fetchOrders(
+  filters: Filters,
+  resturantId: string
+): Promise<Order[]> {
+  const result = await filterOrders(filters, resturantId);
   return result.orders;
 }
 
@@ -25,25 +28,21 @@ const Orders = async () => {
     redirect("/login");
   }
 
-  const { role } = session.user;
+  const { role, resturantId } = session.user;
 
-  const ability = createAbility(role.permissions);
+  const ability: ReturnType<typeof createAbility> = createAbility(
+    role.permissions
+  );
 
-  if (!ability.can(Actions.read, Subjects.orders)) {
+  if (!ability.can(Actions.read, Subjects.orders) || !resturantId) {
     redirect("/403");
   }
 
-  const resturantId = session.user.resturantId;
-
-  if(!resturantId){
-    redirect("/403");
-  }
-
-  const orders = await fetchOrders({});
+  const orders = await fetchOrders({}, resturantId);
 
   return (
     <>
-      <OrderTable initialOrders={orders}/>
+      <OrderTable initialOrders={orders} resturantId={resturantId} />
     </>
   );
 };

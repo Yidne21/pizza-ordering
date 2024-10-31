@@ -10,13 +10,11 @@ export default async function Dashboard() {
     redirect("/login");
   }
 
-  // const { role } = session.user;
+  const { role } = session.user;
 
-  // const ability = createAbility(role.permissions);
-
-  // if (!ability.can("read", "Dashboard")) {
-  //   redirect("/403");
-  // }
+  if (role.name === "customer") {
+    redirect("/403");
+  }
 
   return (
     <>

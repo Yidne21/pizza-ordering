@@ -13,12 +13,14 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import InputField from "@/components/ui/input-field";
 import { addRole } from "@/lib/adminActions";
 import { toast } from "react-toastify";
+import { useSession } from "next-auth/react";
+import { redirect } from "next/navigation";
 
 type Permission = {
   id: string;
   action: string;
   subject: string;
-}
+};
 
 type FormProps = {
   role: {
@@ -30,12 +32,17 @@ type FormProps = {
 
 function AddForm(props: FormProps) {
   const [isSubmitting, setIsSubmitting] = useState(false); // Track submission state
+  const { data: session } = useSession(); // Get session data
+  if (!session?.user.resturantId) {
+    redirect("/login");
+  }
+  const resturantId = session.user.resturantId;
 
   const formattedPers = props.role.permissions.map((permission) => {
     return {
-    id: permission.id,
-    value: `${permission.action} ${permission.subject}`
-    }
+      id: permission.id,
+      value: `${permission.action} ${permission.subject}`,
+    };
   });
 
   const {
@@ -49,14 +56,13 @@ function AddForm(props: FormProps) {
   });
 
   const handleAddRole = async (data: addRoleFormTypes) => {
-
-
     setIsSubmitting(true);
 
     try {
       const formData = new FormData();
       formData.append("name", data.name);
       formData.append("permissions", JSON.stringify(data.permissions));
+      formData.append("resturantId", resturantId);
 
       const response = await addRole(formData);
 
@@ -84,7 +90,7 @@ function AddForm(props: FormProps) {
         alignSelf: "stretch",
         flexShrink: 0,
         width: "100%",
-        p: "20px"
+        p: "20px",
       }}
       component={"form"}
       onSubmit={handleSubmit(handleAddRole)}
@@ -101,7 +107,7 @@ function AddForm(props: FormProps) {
           letterSpacing: "0.15px",
         }}
       >
-         Add Role
+        Add Role
       </Typography>
       <InputField
         label="Name"
@@ -120,8 +126,7 @@ function AddForm(props: FormProps) {
           alignItems: "center",
           flexShrink: 0,
           width: "100%",
-          justifyContent: "space-between"
-
+          justifyContent: "space-between",
         }}
       >
         <Box
@@ -149,16 +154,14 @@ function AddForm(props: FormProps) {
             Permissions
           </Typography>
 
-
           <Box
-            overflow={'auto'}
+            overflow={"auto"}
             sx={{
               display: "flex",
               flexWrap: "wrap",
             }}
           >
             {formattedPers.map((permission, index) => (
-
               <FormControlLabel
                 key={index}
                 control={
@@ -176,7 +179,9 @@ function AddForm(props: FormProps) {
                             field.onChange([...field.value, e.target.value]);
                           } else {
                             field.onChange(
-                              field.value.filter((val) => val !== e.target.value)
+                              field.value.filter(
+                                (val) => val !== e.target.value
+                              )
                             );
                           }
                         }}
@@ -191,11 +196,8 @@ function AddForm(props: FormProps) {
                 }
                 label={permission.value}
               />
-
             ))}
           </Box>
-
-
         </Box>
         <Button
           sx={{
@@ -217,7 +219,7 @@ function AddForm(props: FormProps) {
           type="submit"
           disabled={isSubmitting}
         >
-           Add Role
+          Add Role
         </Button>
       </Box>
     </Box>
