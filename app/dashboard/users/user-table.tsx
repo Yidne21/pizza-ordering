@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 "use client";
 
 import CustomeTable from "@/components/table/custom-table";
@@ -44,7 +45,7 @@ function UserTable(props: UserTableProps) {
       const result = await filterUsers(filters, props.resturantId);
       setData(result.users);
     },
-    [props.resturantId]
+    [props.initialUsers]
   );
 
   return (

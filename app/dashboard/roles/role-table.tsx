@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 "use client";
 
 import React, { useCallback, useState } from "react";
@@ -42,7 +43,7 @@ function RoleTable(props: RoleTableProps) {
       const result = await filterRoles(filters, props.resturantId);
       setData(result.roles);
     },
-    [props.resturantId]
+    [props.initialRoles]
   );
 
   return (

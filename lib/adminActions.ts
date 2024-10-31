@@ -123,6 +123,7 @@ export async function updateOrderStatus({
 
     console.log(res);
 
+    revalidatePath("/dashboard/orders", "page");
     return { success: true, message: "Order status updated successfully" };
   } catch (error) {
     console.error("Error updating order status:", error);
