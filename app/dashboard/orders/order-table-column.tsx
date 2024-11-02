@@ -9,6 +9,7 @@ import Done from "@mui/icons-material/Done";
 import OrderDetail from "./order-detail";
 import useAbilities from "@/hooks/useAbilities";
 import { Actions, Subjects } from "@/utils/permissionSetting";
+import { useSession } from "next-auth/react";
 
 export type Order = {
   id: string;
@@ -98,15 +99,24 @@ const columns: MRT_ColumnDef<Order>[] = [
     Cell: ({ row }) => {
       const status = row.original.status;
       const ability = useAbilities();
+      const { data: session } = useSession();
+      const resturantId = session?.user?.resturantId;
 
-      if (ability && !ability.can(Actions.update, Subjects.order)) {
+      if (
+        (ability && !ability.can(Actions.update, Subjects.order)) ||
+        !resturantId
+      ) {
         return null;
       }
 
       return (
         <Box>
           {status !== "DELIVERED" && (
-            <Dropdown status={status} orderId={row.original.id} />
+            <Dropdown
+              status={status}
+              orderId={row.original.id}
+              resturantId={resturantId}
+            />
           )}
           {status === "DELIVERED" && (
             <Box

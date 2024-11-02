@@ -11,10 +11,10 @@ import {
 import { updateOrderStatus } from "@/lib/adminActions";
 import { toast } from "react-toastify";
 
-
 type DropdownProps = {
   status: string;
   orderId: string;
+  resturantId: string;
 };
 
 export default function Dropdown(props: DropdownProps) {
@@ -23,7 +23,11 @@ export default function Dropdown(props: DropdownProps) {
   const handleChange = async (event: any) => {
     const newStatus = event.target.value;
     setStatus(newStatus);
-    const result = await updateOrderStatus({status: newStatus, orderId: props.orderId});
+    const result = await updateOrderStatus({
+      status: newStatus,
+      orderId: props.orderId,
+      resturantId: props.resturantId,
+    });
     toast.success(result.message);
   };
 

@@ -1,12 +1,12 @@
 "use server";
 
-import { prisma } from "@/lib/prisma";
+import { prisma } from "../lib/prisma.ts";
 import { Prisma, OrderStatus, RoleStatus, UserStatus } from "@prisma/client";
-import { Role } from "@/app/dashboard/roles/role-table-column";
-import { User } from "@/app/dashboard/users/user-table-column";
-import { imageUploader } from "./fileUpload";
+import { Role } from "../app/dashboard/roles/role-table-column.tsx";
+import { User } from "../app/dashboard/users/user-table-column.tsx";
+import { imageUploader } from "./fileUpload.ts";
 import { PermissionType, RoleType, UserType } from "@prisma/client";
-import { revalidatePath } from "next/cache";
+import { revalidatePath } from "next/cache.js";
 import bcrypt from "bcrypt";
 
 // orders
@@ -103,9 +103,11 @@ export async function filterOrders(
 export async function updateOrderStatus({
   orderId,
   status,
+  resturantId,
 }: {
   orderId: string;
   status: string;
+  resturantId: string;
 }) {
   const newStatus =
     status === "DELIVERED"
@@ -115,19 +117,46 @@ export async function updateOrderStatus({
       : OrderStatus.READY;
 
   try {
-    // Update the order status
     const res = await prisma.order.update({
-      where: { id: orderId },
+      where: {
+        id: orderId,
+        pizza: {
+          resturantId,
+        },
+      },
       data: { status: newStatus },
     });
 
-    console.log(res);
+    if (!res) {
+      return { success: false, message: "Order not found" };
+    }
 
-    revalidatePath("/dashboard/orders", "page");
-    return { success: true, message: "Order status updated successfully" };
+    if (process.env.NEXT_ENV !== "test") {
+      revalidatePath("/dashboard/orders", "page");
+    }
+    return {
+      success: true,
+      message: "Order status updated successfully",
+      order: res,
+    };
   } catch (error) {
+    // Check if it's a Prisma error
+    if (error instanceof Prisma.PrismaClientKnownRequestError) {
+      // P2025 indicates that the record doesn't exist
+      if (error.code === "P2025") {
+        return {
+          success: false,
+          message: "order not found",
+        };
+      }
+    }
     console.error("Error updating order status:", error);
-    return { success: false, message: "Could not update order status" };
+
+    return {
+      success: false,
+      message: "Could not update order status",
+      order: {},
+    };
   }
 }
 
