@@ -44,7 +44,7 @@ function AddMenuForm({ resturantId }: AddMenuFormProps) {
       const formData = new FormData();
       formData.append("name", data.name);
       formData.append("price", data.price.toString());
-      formData.append("image", data.logo);
+      formData.append("image", data.logo[0]);
       formData.append("toppings", JSON.stringify(data.toppings));
       formData.append("resturantId", resturantId);
       const response = await addMenu(formData);

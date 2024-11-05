@@ -1,19 +1,26 @@
 import { setWorldConstructor } from "@cucumber/cucumber";
 import { Browser, BrowserContext, Page, chromium } from "@playwright/test";
+import config from "../../playwright.config.ts"; // Adjust the path as necessary
 
 class CustomWorld {
   browser: Browser | null = null;
   context: BrowserContext | null = null;
   page: Page | null = null;
 
-  // Open a new browser and page instance
   async openBrowser() {
-    this.browser = await chromium.launch({ headless: true });
-    this.context = await this.browser.newContext();
+    // Use the settings from the Playwright configuration file
+    const browserOptions = { headless: config.use?.headless ?? true };
+    this.browser = await chromium.launch(browserOptions);
+
+    // Apply context options from the config (e.g., baseURL, viewport)
+    this.context = await this.browser.newContext({
+      baseURL: config.use?.baseURL,
+      viewport: config.use?.viewport,
+    });
+
     this.page = await this.context.newPage();
   }
 
-  // Close the browser and all related instances
   async closeBrowser() {
     await this.page?.close();
     await this.context?.close();
