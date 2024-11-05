@@ -85,17 +85,7 @@ export const addMenuSchema = z.object({
   name: z.string().min(1, { message: "menu name is required!" }),
   price: z.number().min(1, { message: "price is required!" }),
   toppings: z.array(z.string()).min(1, { message: "topping is required!" }),
-  logo: z
-    .any()
-    .optional()
-    .refine(
-      (value) =>
-        typeof value === "string" ||
-        (value instanceof FileList && value.length > 0),
-      {
-        message: "Image is required",
-      }
-    ),
+  logo: z.any().optional(),
 });
 
 export const orderSchema = z.object({
