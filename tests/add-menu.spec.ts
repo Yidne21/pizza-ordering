@@ -53,9 +53,7 @@ test.describe("Add Menu Page Tests", () => {
 
     // Assert the success message is displayed
     // Wait for the success message to appear in the modal
-    const successMessage = await page.locator(
-      "text=You have uploaded the Pizza"
-    );
+    const successMessage = page.locator("text=You have uploaded the Pizza");
 
     // Wait for the success message to be visible
     await expect(successMessage).toBeVisible();
