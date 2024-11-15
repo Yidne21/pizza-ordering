@@ -50,7 +50,11 @@ When("I submit the form", async function () {
   await this.page.getByRole("button", { name: "Submit" }).click();
 });
 
-Then("I should see a success message {string}", async function (message) {
-  const successMessage = this.page.locator(`text=${message}`);
-  await expect(successMessage).toBeVisible();
-});
+Then(
+  "I should see a success message {string}",
+  async function (message: string) {
+    const successMessage = this.page.locator(`text=${message}`);
+    await successMessage.waitFor({ state: "visible" });
+    await expect(successMessage).toBeVisible();
+  }
+);

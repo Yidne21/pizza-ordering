@@ -86,7 +86,9 @@ When(
 Then(
   "the customer should see {string} message",
   async function (successMsg: string) {
-    await expect(this.page.getByText(successMsg)).toBeVisible();
+    const successMessage = this.page.locator(`text=${successMsg}`);
+    await successMessage.waitFor({ state: "visible" });
+    await expect(successMessage).toBeVisible();
   }
 );
 
